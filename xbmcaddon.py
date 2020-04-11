@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0
 
-
 import os
 import io
 import re
