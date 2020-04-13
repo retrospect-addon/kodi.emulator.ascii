@@ -87,7 +87,7 @@ class Dialog(KodiStub):
         :param str heading:                     Dialog heading.
         :param list[string|ListItem] options:   Otions to choose from.
         :param int autoclose:                   Milliseconds to autoclose dialog. (default=do not autoclose)
-        :param list[int]|None preselect:        Indexes of items to preselect in list (default: do not preselect any item)
+        :param int|None preselect:              Indexes of items to preselect in list (default: do not preselect any item)
         :param bool useDetails:                 Use detailed list instead of a compact list. (default=false)
 
         :return: Returns the selected items as a list of indices, or None if cancelled.
