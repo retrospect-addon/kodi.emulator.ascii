@@ -49,6 +49,52 @@ SORT_METHOD_VIDEO_TITLE = 25
 SORT_METHOD_VIDEO_USER_RATING = 20
 SORT_METHOD_VIDEO_YEAR = 18
 
+# Mapping from SORT_METHOD_ID to names
+__sort_method_names = {
+    0: "SORT_METHOD_NONE",
+    1: "SORT_METHOD_LABEL",
+    2: "SORT_METHOD_LABEL_IGNORE_THE",
+    3: "SORT_METHOD_DATE",
+    4: "SORT_METHOD_SIZE",
+    5: "SORT_METHOD_FILE",
+    6: "SORT_METHOD_DRIVE_TYPE",
+    7: "SORT_METHOD_TRACKNUM",
+    8: "SORT_METHOD_DURATION",
+    9: "SORT_METHOD_TITLE",
+    10: "SORT_METHOD_TITLE_IGNORE_THE",
+    11: "SORT_METHOD_ARTIST",
+    13: "SORT_METHOD_ARTIST_IGNORE_THE",
+    14: "SORT_METHOD_ALBUM",
+    15: "SORT_METHOD_ALBUM_IGNORE_THE",
+    16: "SORT_METHOD_GENRE",
+    17: "SORT_METHOD_COUNTRY",
+    18: "SORT_METHOD_VIDEO_YEAR",
+    19: "SORT_METHOD_VIDEO_RATING",
+    20: "SORT_METHOD_VIDEO_USER_RATING",
+    21: "SORT_METHOD_DATEADDED",
+    22: "SORT_METHOD_PROGRAM_COUNT",
+    23: "SORT_METHOD_PLAYLIST_ORDER",
+    24: "SORT_METHOD_EPISODE",
+    25: "SORT_METHOD_VIDEO_TITLE",
+    26: "SORT_METHOD_VIDEO_SORT_TITLE",
+    27: "SORT_METHOD_VIDEO_SORT_TITLE_IGNORE_THE",
+    28: "SORT_METHOD_PRODUCTIONCODE",
+    29: "SORT_METHOD_SONG_RATING",
+    30: "SORT_METHOD_SONG_USER_RATING",
+    31: "SORT_METHOD_MPAA_RATING",
+    32: "SORT_METHOD_VIDEO_RUNTIME",
+    33: "SORT_METHOD_STUDIO",
+    34: "SORT_METHOD_STUDIO_IGNORE_THE",
+    35: "SORT_METHOD_FULLPATH",
+    36: "SORT_METHOD_LABEL_IGNORE_FOLDERS",
+    37: "SORT_METHOD_LASTPLAYED",
+    38: "SORT_METHOD_PLAYCOUNT",
+    39: "SORT_METHOD_LISTENERS",
+    40: "SORT_METHOD_UNSORTED",
+    41: "SORT_METHOD_CHANNEL",
+    43: "SORT_METHOD_BITRATE",
+    44: "SORT_METHOD_DATE_TAKEN",
+}
 
 # noinspection PyUnresolvedReferences
 __handle_info = dict()  # type: dict[int, dict]
@@ -171,8 +217,8 @@ def addSortMethod(handle, sortMethod, label2Mask="%D"):  # NOSONAR
 
     """
 
-    KodiStub.print_line("{}>{} Added sortmethod: {:02d}".format(
-        Colors.Yellow, Colors.EndColor, sortMethod))
+    KodiStub.print_line("{}>{} Added sortmethod: {:02d} - {}".format(
+        Colors.Yellow, Colors.EndColor, sortMethod, __sort_method_names.get(sortMethod, "<unknown")))
 
     handle_info = __handle_info.get(handle, dict())
     if "sort_methods" not in handle_info:
