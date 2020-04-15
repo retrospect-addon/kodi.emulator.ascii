@@ -505,7 +505,11 @@ def log(msg, level=0):
         print(msg)
 
 
-def get_add_on_info_from_calling_script(add_on_id=None):
+def get_add_on_info_from_calling_script(add_on_id=None, print_info=False):
+    if add_on_id is not None:
+        # Always print details for specific add-ons
+        print_info = True
+
     # What is the Kodi Home path?
     assert os.path.isfile("addon.xml"), "Working directory outside add-on path: {}".format(os.getcwd())
     calling_add_on_path = os.getcwd()
@@ -562,9 +566,19 @@ def get_add_on_info_from_calling_script(add_on_id=None):
         kodi_profile_path=add_on_profile_path
     )
 
-    if KodiStub.is_verbose:
-        print(a)
+    if not print_info:
+        return a
+
+    KodiStub.print_line(
+        "Found Add-on info: \n"
+        "- Kodi Home (special://home):       {} \n"
+        "- Add-on ID:                        {} \n"
+        "- Add-on Path:                      {} \n"
+        "- Kodi Profile (special://profile): {} \n"
+        .format(a.kodi_home_path, a.kodi_profile_path, a.add_on_id, a.add_on_path),
+        color=Colors.Blue
+    )
     return a
 
 
-__add_on_info = get_add_on_info_from_calling_script()
+__add_on_info = get_add_on_info_from_calling_script(print_info=True)
