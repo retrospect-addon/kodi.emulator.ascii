@@ -517,6 +517,7 @@ def get_add_on_info_from_calling_script(add_on_id=None):
         # determine it based on the running path
         kodi_home_path, addon_name, path_add_on_id = os.getcwd().rsplit(os.sep, 2)
 
+    kodi_home_path = os.path.abspath(kodi_home_path)
     assert os.path.isdir(kodi_home_path), "Kodi home path does not exist: '{}'".format(kodi_home_path)
 
     # Find the very first script called to determine the add-on ID if it was not specified
@@ -527,14 +528,24 @@ def get_add_on_info_from_calling_script(add_on_id=None):
     if not os.path.isdir(add_on_path) and "portable_data" in add_on_path:
         add_on_path = os.path.abspath(os.path.join(kodi_home_path, "..", "addons", add_on_id))
 
+    assert os.path.isdir(add_on_path), \
+        "Invalid Kodi add-on dir: {}".format(add_on_path)
+
     # The active profile path
+    if "KODI_PROFILE" in os.environ:
+        add_on_profile_path = os.path.abspath(os.environ["KODI_PROFILE"])
+    else:
+        add_on_profile_path = os.path.join(kodi_home_path, "userdata")
+
+    add_on_profile_path = os.path.abspath(add_on_profile_path)
+    assert os.path.isdir(add_on_profile_path), \
+        "Invalid Kodi profile dir: {}".format(add_on_profile_path)
+
     if "KODI_ACTIVE_PROFILE" in os.environ:
         add_on_profile_path = os.path.join(
             kodi_home_path, "userdata", "profiles", os.environ["KODI_ACTIVE_PROFILE"])
         if not add_on_profile_path.endswith("userdata"):
             raise ValueError("Invalid profile path special://profile. Should end with 'userdata'")
-    else:
-        add_on_profile_path = os.path.join(kodi_home_path, "userdata")
 
     a = AddonData(
         kodi_home_path=kodi_home_path,
