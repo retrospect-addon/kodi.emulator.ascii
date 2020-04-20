@@ -124,8 +124,12 @@ class Dialog(KodiStub):
 
         self.print_heading(heading)
         question = "{} [{}]{} or [{}]{}:".format(message, yeslabel[0], yeslabel[1:], nolabel[0], nolabel[1:])
-        answer = self.read_input(question, Colors.Yellow)
-        return yeslabel.lower().startswith(answer.lower())
+        if KodiStub.is_interactive:
+            answer = self.read_input(question, Colors.Yellow)
+            return yeslabel.lower().startswith(answer.lower())
+        else:
+            KodiStub.print_line(question, Colors.Yellow)
+            return True
 
     # noinspection PyUnusedLocal
     def notification(self, heading, message, icon=NOTIFICATION_INFO, time=5000, sound=True):
