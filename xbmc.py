@@ -353,8 +353,8 @@ def translatePath(path):  # NOSONAR
             raise ValueError("Missing kodi_profile_path data")
 
         return_path = os.path.join(__add_on_info.kodi_profile_path, sub_path.replace("/", os.sep))
-        if not os.path.isdir(return_path):
-            raise ValueError("Invalid Profile path: %s" % (path,))
+        if not os.path.exists(return_path):
+            raise ValueError("Invalid path in profile specified: %s" % (path,))
 
     elif path.startswith("special://home/"):
         sub_path = path.replace("special://home/", "")
