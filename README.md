@@ -26,7 +26,11 @@ Not all libraries are present and certainly not all methods are implemented. Cur
 Feel free to contribute to the completion using Pull Requests for this repository.
 
 ### Using _SAKÉ_
-In order to use _SAKÉ_ for development Kodi add-ons, you will need to include its path the the Python paths. Eiter via:
+SAKÉ can be installed using the `pip install` command:
+
+    $ pip install sakee
+    
+This will install SAKÉ in the active Python installation. It will be available directly to all your Python scripts. If you choose to not use `pip install` and want to run it from a specific (custom) location then you you will need to include its path the the Python paths. Eiter via:
 
 ```Python
 sys.path.append('<path to SAKÉ>')
