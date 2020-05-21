@@ -3,7 +3,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=retrospect-addon%3Akodi.emulator.ascii&metric=alert_status)](https://sonarcloud.io/dashboard?id=retrospect-addon%3Akodi.emulator.ascii)
 [![Python](https://img.shields.io/badge/python-2.7%20%7C%203.6-blue?logo=python)](https://kodi.tv/article/attention-addon-developers-migration-python-3)
 
-![alt text](sake.png "Simple ASCII Kodi Emulator")
+![alt text](https://github.com/retrospect-addon/kodi.emulator.ascii/raw/master/sake.png "Simple ASCII Kodi Emulator")
 
 ## _SAKÉ_: your favourite 'drink' for debugging and developiong Kodi Python add-ons
 SAKÉ can help you to debug and develop Kodi Python add-ons. It contains a set of libraries that try to mimic the functionality of the corresponding Kodi modules:
