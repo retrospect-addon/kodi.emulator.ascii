@@ -50,4 +50,4 @@ If your add-on is in a subfolder of Kodi's `addons` folder, you are done. _SAKÉ
 | `KODI_ACTIVE_PROFILE` | _SAKÉ_ will asume that you don't have any Kodi profiles, but in case  you have, you can specify what profile to use for the add-on settings. |
 | `KODI_INTERACTIVE`   | Normally, _SAKÉ_ will try to interact with you: Whenever there should be a dialog shown within Kodi, _SAKÉ_ will present you with an ASCII version and wait for a response. You can disable this by setting this environment variable to "0". _SAKÉ_ will not disturb you and will continue. However, _SAKÉ_ will answer those dialogs for you and that **might result in unwanted actions**, but it might come in handy while running unit tests.|
 | `KODI_STUB_VERBOSE` | If set to "1" will make _SAKÉ_ a bit more verbose. |
-
+| `KODI_STUB_RPC_RESPONSES` | Specifies the folder from which to read JSON RPC responses. If you don't set this, you won't be able to use `xbmc.executeJSONRPC` |

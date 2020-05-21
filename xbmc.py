@@ -315,7 +315,10 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
 
     json_data = json.loads(jsonrpccommand)
     json_method = json_data["method"]
-    json_responses = os.path.join(os.path.dirname(__file__), "jsonrcpcommands")
+    json_responses = os.environ.get("KODI_STUB_RPC_RESPONSES")
+    if not json_responses:
+        raise ValueError("Could not find JSON Response folder. Use the environment variable KODI_STUB_RPC_RESPONSES to set one")
+
     json_response = os.path.join(json_responses, "{}.json".format(json_method.lower()))
 
     if os.path.isfile(json_response):
