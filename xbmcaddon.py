@@ -228,7 +228,6 @@ class Addon(KodiStub):
             self.__version = re.findall(r'version="(\d+.\d+.\d+[^"]*)', xml_content)[0]
             self.__add_on_id = re.findall(r'addon\W+id="([^"]+)"', xml_content)[0]
             self.__name = re.findall(r'name="([^"]+)"', xml_content)[0]
-        return
 
     def __get_settings(self):
         if self.__add_on_id in Addon.__settings:
@@ -247,6 +246,8 @@ class Addon(KodiStub):
 
         setting_regex = r'id="([^"]+)"[^>]*default="([^"]*)"'
         results = re.findall(setting_regex, default_xml)
+        if not results:
+            results = re.findall(r'setting id="(.*?)".*?<default>(.*?)<', default_xml, re.DOTALL)
         settings = {}
         for result in results:
             settings[result[0]] = result[1]
