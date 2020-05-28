@@ -114,6 +114,10 @@ class KodiStub(object):
                 return Colors.Yellow
             elif color_name == "dimgray":
                 return Colors.DarkGrey
+            elif color_name == "aqua":
+                return Colors.LightBlue
+            elif color_name == "red":
+                return Colors.Red
             else:
                 return Colors.EndColor
 

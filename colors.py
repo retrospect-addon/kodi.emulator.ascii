@@ -31,4 +31,4 @@ if __name__ == '__main__':
     for color in dir(Colors):
         if color.startswith("__"):
             continue
-        exec("print Colors.%s + color + Colors.EndColor" % (color, ))
+        exec("print(Colors.%s + color + Colors.EndColor)" % (color, ))
