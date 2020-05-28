@@ -13,7 +13,6 @@ from xbmcgui import ListItem
 from colors import Colors
 from stub import KodiStub
 
-
 DRIVE_NOT_READY = 1
 ENGLISH_NAME = 2
 ISO_639_1 = 0
@@ -350,23 +349,31 @@ def translatePath(path):  # NOSONAR
 
     """
 
-    if path.startswith("special://profile/"):
-        sub_path = path.replace("special://profile/", "")
-        if not __add_on_info.kodi_profile_path:
-            raise ValueError("Missing kodi_profile_path data")
+    def get_return_path(base_path, name, *segments):
+        if not base_path:
+            raise ValueError("Missing __kodi_{}_path data".format(name))
+        new_path = os.path.join(base_path, *[i.replace("/", os.sep) for i in segments if i and i != ''])
 
-        return_path = os.path.join(__add_on_info.kodi_profile_path, sub_path.replace("/", os.sep))
-        if not os.path.exists(return_path):
-            raise ValueError("Invalid path in profile specified: %s" % (path,))
+        if not os.path.exists(new_path):
+            raise ValueError("Invalid path specified: {}".format(path, ))
+
+        return new_path
+
+    if path.startswith("special://profile/"):
+        return_path = get_return_path(__add_on_info.kodi_profile_path,
+                                      "profile",
+                                      path.replace("special://profile/", ""))
 
     elif path.startswith("special://home/"):
-        sub_path = path.replace("special://home/", "")
-        if not __add_on_info.kodi_home_path:
-            raise ValueError("Missing __kodi_home_path data")
+        return_path = get_return_path(__add_on_info.kodi_home_path,
+                                      "home",
+                                      path.replace("special://home/", ""))
 
-        return_path = os.path.join(__add_on_info.kodi_home_path, sub_path.replace("/", os.sep))
-        if not os.path.isdir(return_path):
-            raise ValueError("Invalid Kodi Home path: %s" % (path,))
+    elif path.startswith("special://xbmcbin/"):
+        return_path = get_return_path(__add_on_info.kodi_home_path,
+                                      "home",
+                                      "system",
+                                      path.replace("special://xbmcbin/", ""))
 
     elif os.path.isabs(path):
         return path
@@ -444,7 +451,7 @@ def getInfoLabel(infoTag):  # NOSONAR
 
     if infoTag == "system.buildversion":
         return "18.1 Git:20160424-c327c53"
-    
+
     return "InfoLabel:{}".format(infoTag)
 
 
