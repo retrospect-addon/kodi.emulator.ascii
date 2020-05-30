@@ -323,7 +323,7 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
         with io.open(path, mode='r', encoding='utf-8') as fd:
             stub_content = json.loads(fd.read())
             if isinstance(stub_content, dict):
-                return json_data.dumps(stub_content)
+                return json.dumps(stub_content)
             try:
                 return json.dumps(next(stub.get('response')
                                        for stub in stub_content
