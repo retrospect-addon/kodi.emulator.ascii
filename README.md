@@ -51,3 +51,68 @@ If your add-on is in a subfolder of Kodi's `addons` folder, you are done. _SAKÉ
 | `KODI_INTERACTIVE`   | Normally, _SAKÉ_ will try to interact with you: Whenever there should be a dialog shown within Kodi, _SAKÉ_ will present you with an ASCII version and wait for a response. You can disable this by setting this environment variable to "0". _SAKÉ_ will not disturb you and will continue. However, _SAKÉ_ will answer those dialogs for you and that **might result in unwanted actions**, but it might come in handy while running unit tests.|
 | `KODI_STUB_VERBOSE` | If set to "1" will make _SAKÉ_ a bit more verbose. |
 | `KODI_STUB_RPC_RESPONSES` | Specifies the folder from which to read JSON RPC responses. If you don't set this, you won't be able to use `xbmc.executeJSONRPC` |
+
+### JSON RPC responses
+I order to respond to the JSON RPC requests, issued via `executeJSONRPC`, a folder with response files can be configured using the `KODI_STUB_RPC_RESPONSES` environment variable (see above). This folder should contain response files with the following naming conversions:
+
+    <method_name>.json
+    
+So, for instance `favourites.getfavourites.json`. Inside the file there is: 
+
+- A single complete JSON response. In this case, the complete content of the file will be used, as is, as the JSON RPC response.
+- A list of JSON request-response pairs with different input parameters. Using the input parameters of the JSON RPC request, the correct response is determined and returned as the JSON RPC response.
+
+In the latter case, the content of a stub file could look like this:
+
+```json
+[
+  {
+    "request": {
+      "params": {
+        "setting": "network.usehttpproxy"
+      },
+      "jsonrpc": "2.0",
+      "method": "Settings.GetSettingValue",
+      "id": 0
+    },
+    "response": {
+      "id": 5,
+      "jsonrpc": "2.0",
+      "result": {
+        "value": false
+      }
+    }
+  },
+  {
+    "request": {
+      "params": {
+        "setting": "network.httpproxyusername"
+      },
+      "jsonrpc": "2.0",
+      "method": "Settings.GetSettingValue",
+      "id": 0
+    },
+    "response": {
+      "id": 5,
+      "jsonrpc": "2.0",
+      "result": {
+        "value": true
+      }
+    }
+  }
+]
+```
+
+This stub file contains responses for the method `Settings.GetSettingValue` for the setting `network.usehttpproxy` and `network.httpproxyusername`.
+
+If no file with mathing method name is found or the file does not contain the correct responses an 'OK' is returned:
+
+```json
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": "OK"
+}
+``` 
+
+Just like most of the Kodi JSON RPC calls do.
