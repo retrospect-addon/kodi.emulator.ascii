@@ -38,7 +38,6 @@ TRAY_CLOSED_MEDIA_PRESENT = 96
 TRAY_CLOSED_NO_MEDIA = 64
 TRAY_OPEN = 16
 
-
 # Custom AddonData type
 AddonData = namedtuple('AddonData', [
     'kodi_home_path',       # data path (either portable of user path)
@@ -316,15 +315,24 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
     json_method = json_data["method"]
     json_responses = os.environ.get("KODI_STUB_RPC_RESPONSES")
     if not json_responses:
-        raise ValueError("Could not find JSON Response folder. Use the environment variable KODI_STUB_RPC_RESPONSES to set one")
+        raise ValueError(
+            "Could not find JSON Response folder. Use the environment variable KODI_STUB_RPC_RESPONSES to set one")
 
-    json_response = os.path.join(json_responses, "{}.json".format(json_method.lower()))
+    path = "{}.json".format(os.path.join(os.path.join(json_responses, json_method.lower())))
+    if os.path.isfile(path):
+        with io.open(path, mode='r', encoding='utf-8') as fd:
+            stub_content = json.loads(fd.read())
+            if isinstance(stub_content, dict):
+                return json_data.dumps(stub_content)
+            try:
+                return json.dumps(next(stub.get('response')
+                                       for stub in stub_content
+                                       if json_data.get('params')
+                                       and stub.get('request', {}).get('method') == json_data.get('method')
+                                       and stub.get('request', {}).get('params') == json_data.get('params')))
+            except StopIteration:
+                pass
 
-    if os.path.isfile(json_response):
-        with io.open(json_response, mode='r', encoding='utf-8') as fd:
-            return fd.read()
-
-    # {"error":{"code":-32602,"message":"Invalid params."},"id":1,"jsonrpc":"2.0"}
     return '{"id":1,"jsonrpc":"2.0","result":"OK"}'
 
 
@@ -585,7 +593,7 @@ def get_add_on_info_from_calling_script(add_on_id=None, print_info=False):
         "- Add-on ID:                        {} \n"
         "- Add-on Path:                      {} \n"
         "- Kodi Profile (special://profile): {} \n"
-        .format(a.kodi_home_path, a.kodi_profile_path, a.add_on_id, a.add_on_path),
+            .format(a.kodi_home_path, a.kodi_profile_path, a.add_on_id, a.add_on_path),
         color=Colors.Blue
     )
     return a
