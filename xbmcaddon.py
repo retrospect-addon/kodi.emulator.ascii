@@ -26,6 +26,12 @@ class Addon(KodiStub):
         # actual live data
         self.__version = None
         self.__name = None
+        self.__author = None
+        self.__icon = None
+        self.__summary = None
+        self.__news = None
+        self.__disclaimer = None
+        self.__description = None
         self.__load_add_on_xml()
         self.__localization = self.__get_strings()
         self.__settings = self.__get_settings()
@@ -158,16 +164,37 @@ class Addon(KodiStub):
 
         Possible options are: author, changelog, description, disclaimer, fanart, icon, id,
                               name, path, profile, stars, summary, type, version
-        """ 
+        """
+        id = id.lower()
 
-        if id == "path":
-            return self.__add_on_path
+        if id == "author":
+            return self.__author
+        elif id == "changelog":
+            return self.__news
+        elif id == "description":
+            return self.__description
+        elif id == "disclaimer":
+            return self.__disclaimer
+        elif id == "fanart":
+            return self.__fanart
+        elif id == "icon":
+            return self.__icon
         elif id == "id":
             return self.__add_on_id
-        elif id == "version":
-            return self.__version
         elif id == "name":
             return self.__name
+        elif id == "path":
+            return self.__add_on_path
+        elif id == "profile":
+            return self.__add_on_profile_path
+        elif id == "stars":
+            pass
+        elif id == "summary":
+            return self.__summary
+        elif id == "type":
+            pass
+        elif id == "version":
+            return self.__version
 
         raise ValueError("Cannot find info '%s'" % (id,))
 
@@ -225,9 +252,48 @@ class Addon(KodiStub):
 
         with io.open(add_on_xml, encoding='utf-8') as fp:
             xml_content = fp.read()
-            self.__version = re.findall(r'version="(\d+.\d+.\d+[^"]*)', xml_content)[0]
+            self.__version = re.findall(r'<addon.*?version="(\d+(?:\.\d)?(?:\.\d)?[^"]*)', xml_content)[0]
             self.__add_on_id = re.findall(r'addon\W+id="([^"]+)"', xml_content)[0]
             self.__name = re.findall(r'name="([^"]+)"', xml_content)[0]
+            tmp = re.findall(r'<addon.*?provider-name="([^"]+)', xml_content)
+            if tmp:
+                self.__author = tmp[0]
+
+            tmp = re.findall(r'<news>(.*?)</news>', xml_content, flags=re.DOTALL)
+            if tmp:
+                self.__news = tmp[0]
+
+            tmp = re.findall(r'<description lang=\"\w+\">(.*?)</description>', xml_content, flags=re.DOTALL)
+            if tmp:
+                for desc in tmp:
+                    lng = desc.strip('"')[1]
+                    if lng == xbmc.getLanguage():
+                        self.__description = desc
+                        break
+                else:
+                    self.__description = tmp[0]
+
+            tmp = re.findall(r'<disclaimer>(.*?)</disclaimer>', xml_content, flags=re.DOTALL)
+            if tmp:
+                self.__disclaimer = tmp[0]
+
+            tmp = re.findall(r'<fanart>(.*?)</fanart>', xml_content, flags=re.DOTALL)
+            if tmp:
+                self.__fanart = tmp[0]
+
+            tmp = re.findall(r'<icon>(.*?)</icon>', xml_content, flags=re.DOTALL)
+            if tmp:
+                self.__icon = tmp[0]
+
+            tmp = re.findall(r'<summary lang=\"\w+\">(.*?)</summary>', xml_content, flags=re.DOTALL)
+            if tmp:
+                for desc in tmp:
+                    lng = desc.strip('"')[1]
+                    if lng == xbmc.getLanguage():
+                        self.__summary = desc
+                        break
+                else:
+                    self.__summary = tmp[0]
 
     def __get_settings(self):
         if self.__add_on_id in Addon.__settings:
