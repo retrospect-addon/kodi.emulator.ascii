@@ -166,6 +166,7 @@ class Addon(KodiStub):
                               name, path, profile, stars, summary, type, version
         """
         id = id.lower()
+        # missing: starts - type
 
         if id == "author":
             return self.__author
@@ -187,12 +188,8 @@ class Addon(KodiStub):
             return self.__add_on_path
         elif id == "profile":
             return self.__add_on_profile_path
-        elif id == "stars":
-            pass
         elif id == "summary":
             return self.__summary
-        elif id == "type":
-            pass
         elif id == "version":
             return self.__version
 
@@ -247,53 +244,45 @@ class Addon(KodiStub):
 
         return translations
 
+    def __filter_lang_xmltag(self, tag, xml_content):
+        tag_matches = re.findall(r'<' + tag + r'(?:\s*lang=\"([a-zA-Z-]+)\")?\s*>(.*?)</' + tag + '>', xml_content, flags=re.DOTALL)
+        if tag_matches:
+            for match in tag_matches:
+                if match[0].startswith('en'):
+                    return match[1]
+            else:
+                return tag_matches[0][1]
+        return None
+
     def __load_add_on_xml(self):
         add_on_xml = os.path.join(self.__add_on_path, "addon.xml")
 
         with io.open(add_on_xml, encoding='utf-8') as fp:
             xml_content = fp.read()
-            self.__version = re.findall(r'<addon.*?version="(\d+(?:\.\d)?(?:\.\d)?[^"]*)', xml_content)[0]
+            self.__version = re.findall(r'<addon.*?version="(\d+(?:\.\d)?(?:\.\d)?[^"]*)', xml_content, flags=re.DOTALL)[0]
             self.__add_on_id = re.findall(r'addon\W+id="([^"]+)"', xml_content)[0]
             self.__name = re.findall(r'name="([^"]+)"', xml_content)[0]
-            tmp = re.findall(r'<addon.*?provider-name="([^"]+)', xml_content)
-            if tmp:
-                self.__author = tmp[0]
 
-            tmp = re.findall(r'<news>(.*?)</news>', xml_content, flags=re.DOTALL)
-            if tmp:
-                self.__news = tmp[0]
+            self.__description = self.__filter_lang_xmltag('description', xml_content)
+            self.__disclaimer = self.__filter_lang_xmltag('disclaimer', xml_content)
+            self.__summary = self.__filter_lang_xmltag('summary', xml_content)
 
-            tmp = re.findall(r'<description lang=\"\w+\">(.*?)</description>', xml_content, flags=re.DOTALL)
-            if tmp:
-                for desc in tmp:
-                    lng = desc.strip('"')[1]
-                    if lng == xbmc.getLanguage():
-                        self.__description = desc
-                        break
-                else:
-                    self.__description = tmp[0]
+            author_matches = re.findall(r'<addon.*?provider-name="([^"]+)', xml_content, flags=re.DOTALL)
+            if author_matches:
+                self.__author = author_matches[0]
 
-            tmp = re.findall(r'<disclaimer>(.*?)</disclaimer>', xml_content, flags=re.DOTALL)
-            if tmp:
-                self.__disclaimer = tmp[0]
+            news_matches = re.findall(r'<news>(.*?)</news>', xml_content, flags=re.DOTALL)
+            if news_matches:
+                self.__news = news_matches[0]
 
-            tmp = re.findall(r'<fanart>(.*?)</fanart>', xml_content, flags=re.DOTALL)
-            if tmp:
-                self.__fanart = tmp[0]
+            fanart_matches = re.findall(r'<fanart>(.*?)</fanart>', xml_content, flags=re.DOTALL)
+            if fanart_matches:
+                self.__fanart = os.path.join(self.__add_on_path, fanart_matches[0])
 
-            tmp = re.findall(r'<icon>(.*?)</icon>', xml_content, flags=re.DOTALL)
-            if tmp:
-                self.__icon = tmp[0]
+            icon_matches = re.findall(r'<icon>(.*?)</icon>', xml_content, flags=re.DOTALL)
+            if icon_matches:
+                self.__icon = os.path.join(self.__add_on_path, icon_matches[0])
 
-            tmp = re.findall(r'<summary lang=\"\w+\">(.*?)</summary>', xml_content, flags=re.DOTALL)
-            if tmp:
-                for desc in tmp:
-                    lng = desc.strip('"')[1]
-                    if lng == xbmc.getLanguage():
-                        self.__summary = desc
-                        break
-                else:
-                    self.__summary = tmp[0]
 
     def __get_settings(self):
         if self.__add_on_id in Addon.__settings:
