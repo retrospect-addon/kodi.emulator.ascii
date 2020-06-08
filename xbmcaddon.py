@@ -245,7 +245,7 @@ class Addon(KodiStub):
         return translations
 
     def __filter_lang_xmltag(self, tag, xml_content):
-        tag_matches = re.findall(r'<' + tag + r'(?:\s*lang=\"([a-zA-Z-]+)\")?\s*>(.*?)</' + tag + '>', xml_content, flags=re.DOTALL)
+        tag_matches = re.findall(r'<' + tag + r'(?:\s*lang=\"([a-zA-Z-_]+)\")?\s*>(.*?)</' + tag + '>', xml_content, flags=re.DOTALL)
         if tag_matches:
             for match in tag_matches:
                 if match[0].startswith('en'):
@@ -259,8 +259,8 @@ class Addon(KodiStub):
 
         with io.open(add_on_xml, encoding='utf-8') as fp:
             xml_content = fp.read()
-            self.__version = re.findall(r'<addon.*?version="(\d+(?:\.\d)?(?:\.\d)?[^"]*)', xml_content, flags=re.DOTALL)[0]
-            self.__add_on_id = re.findall(r'addon\W+id="([^"]+)"', xml_content)[0]
+            self.__version = re.findall(r'<addon.*?version="([^"]*)', xml_content, flags=re.DOTALL)[0]
+            self.__add_on_id = re.findall(r'addon.*?id="([^"]+)"', xml_content, flags=re.DOTALL)[0]
             self.__name = re.findall(r'name="([^"]+)"', xml_content)[0]
 
             self.__description = self.__filter_lang_xmltag('description', xml_content)
@@ -282,7 +282,6 @@ class Addon(KodiStub):
             icon_matches = re.findall(r'<icon>(.*?)</icon>', xml_content, flags=re.DOTALL)
             if icon_matches:
                 self.__icon = os.path.join(self.__add_on_path, icon_matches[0])
-
 
     def __get_settings(self):
         if self.__add_on_id in Addon.__settings:
