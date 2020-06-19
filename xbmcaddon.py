@@ -26,6 +26,12 @@ class Addon(KodiStub):
         # actual live data
         self.__version = None
         self.__name = None
+        self.__author = None
+        self.__icon = None
+        self.__summary = None
+        self.__news = None
+        self.__disclaimer = None
+        self.__description = None
         self.__load_add_on_xml()
         self.__localization = self.__get_strings()
         self.__settings = self.__get_settings()
@@ -158,16 +164,34 @@ class Addon(KodiStub):
 
         Possible options are: author, changelog, description, disclaimer, fanart, icon, id,
                               name, path, profile, stars, summary, type, version
-        """ 
+        """
+        id = id.lower()
+        # missing: starts - type
 
-        if id == "path":
-            return self.__add_on_path
+        if id == "author":
+            return self.__author
+        elif id == "changelog":
+            return self.__news
+        elif id == "description":
+            return self.__description
+        elif id == "disclaimer":
+            return self.__disclaimer
+        elif id == "fanart":
+            return self.__fanart
+        elif id == "icon":
+            return self.__icon
         elif id == "id":
             return self.__add_on_id
-        elif id == "version":
-            return self.__version
         elif id == "name":
             return self.__name
+        elif id == "path":
+            return self.__add_on_path
+        elif id == "profile":
+            return self.__add_on_profile_path
+        elif id == "summary":
+            return self.__summary
+        elif id == "version":
+            return self.__version
 
         raise ValueError("Cannot find info '%s'" % (id,))
 
@@ -220,14 +244,44 @@ class Addon(KodiStub):
 
         return translations
 
+    def __filter_lang_xmltag(self, tag, xml_content):
+        tag_matches = re.findall(r'<' + tag + r'(?:\s*lang=\"([a-zA-Z-_]+)\")?\s*>(.*?)</' + tag + '>', xml_content, flags=re.DOTALL)
+        if tag_matches:
+            for match in tag_matches:
+                if match[0].startswith('en'):
+                    return match[1]
+            else:
+                return tag_matches[0][1]
+        return None
+
     def __load_add_on_xml(self):
         add_on_xml = os.path.join(self.__add_on_path, "addon.xml")
 
         with io.open(add_on_xml, encoding='utf-8') as fp:
             xml_content = fp.read()
-            self.__version = re.findall(r'version="(\d+.\d+.\d+[^"]*)', xml_content)[0]
-            self.__add_on_id = re.findall(r'addon\W+id="([^"]+)"', xml_content)[0]
+            self.__version = re.findall(r'<addon.*?version="([^"]*)', xml_content, flags=re.DOTALL)[0]
+            self.__add_on_id = re.findall(r'addon.*?id="([^"]+)"', xml_content, flags=re.DOTALL)[0]
             self.__name = re.findall(r'name="([^"]+)"', xml_content)[0]
+
+            self.__description = self.__filter_lang_xmltag('description', xml_content)
+            self.__disclaimer = self.__filter_lang_xmltag('disclaimer', xml_content)
+            self.__summary = self.__filter_lang_xmltag('summary', xml_content)
+
+            author_matches = re.findall(r'<addon.*?provider-name="([^"]+)', xml_content, flags=re.DOTALL)
+            if author_matches:
+                self.__author = author_matches[0]
+
+            news_matches = re.findall(r'<news>(.*?)</news>', xml_content, flags=re.DOTALL)
+            if news_matches:
+                self.__news = news_matches[0]
+
+            fanart_matches = re.findall(r'<fanart>(.*?)</fanart>', xml_content, flags=re.DOTALL)
+            if fanart_matches:
+                self.__fanart = os.path.join(self.__add_on_path, fanart_matches[0])
+
+            icon_matches = re.findall(r'<icon>(.*?)</icon>', xml_content, flags=re.DOTALL)
+            if icon_matches:
+                self.__icon = os.path.join(self.__add_on_path, icon_matches[0])
 
     def __get_settings(self):
         if self.__add_on_id in Addon.__settings:
