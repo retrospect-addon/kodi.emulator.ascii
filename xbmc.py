@@ -593,7 +593,7 @@ def get_add_on_info_from_calling_script(add_on_id=None, print_info=False):
         "- Add-on ID:                        {} \n"
         "- Add-on Path:                      {} \n"
         "- Kodi Profile (special://profile): {} \n"
-            .format(a.kodi_home_path, a.kodi_profile_path, a.add_on_id, a.add_on_path),
+            .format(a.kodi_home_path, a.add_on_id, a.add_on_path, a.kodi_profile_path),
         color=Colors.Blue
     )
     return a
