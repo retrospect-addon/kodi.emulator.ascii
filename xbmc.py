@@ -308,11 +308,18 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
     :rtype: str
 
     See https://codedocs.xyz/xbmc/xbmc/namespace_j_s_o_n_r_p_c.html
-
     """
 
     json_data = json.loads(jsonrpccommand)
     json_method = json_data["method"]
+    json_params = json_data["params"]
+
+    # Implement some methods for real
+    import jsonrpc
+    if json_method.lower() == 'settings.getsettingvalue':
+        return jsonrpc.Settings().GetSettingValue(**json_params)
+
+    # Fallback to stubs
     json_responses = os.environ.get("KODI_STUB_RPC_RESPONSES")
     if not json_responses:
         raise ValueError(
