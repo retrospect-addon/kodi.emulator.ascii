@@ -90,7 +90,7 @@ class Monitor(KodiStub):
 
 # noinspection PyPep8Naming
 class Keyboard(KodiStub):
-    def __init__(self, line, heading, hidden):
+    def __init__(self, line="", heading="", hidden=False):
         """
 
         :param str line:        The default line to show?
