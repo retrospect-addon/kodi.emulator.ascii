@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0
 
-from colors import Colors
-from stub import KodiStub
+from sakee.colors import Colors
+from sakee.stub import KodiStub
 
 NOTIFICATION_INFO = "info"
 NOTIFICATION_WARNING = "warning"

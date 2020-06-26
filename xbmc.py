@@ -10,8 +10,8 @@ from collections import namedtuple
 
 from xbmcgui import ListItem
 
-from colors import Colors
-from stub import KodiStub
+from sakee.colors import Colors
+from sakee.stub import KodiStub
 
 DRIVE_NOT_READY = 1
 ENGLISH_NAME = 2
@@ -309,7 +309,7 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
 
     See https://codedocs.xyz/xbmc/xbmc/namespace_j_s_o_n_r_p_c.html
     """
-    from sakejsonrpc import JsonRpcApi
+    from sakee.sakejsonrpc import JsonRpcApi
 
     json_data = json.loads(jsonrpccommand)
     try:

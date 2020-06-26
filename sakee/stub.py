@@ -4,7 +4,7 @@ import os
 import re
 import sys
 
-from colors import Colors
+from sakee.colors import Colors
 
 
 class KodiStub(object):

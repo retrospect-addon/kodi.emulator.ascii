@@ -68,7 +68,7 @@ class JsonRpcApi(object):
                     JsonRpcApi.Settings.__SETTINGS = dict(results)
 
         # noinspection PyPep8Naming
-        def GetSettingValue(self, setting):
+        def GetSettingValue(self, setting):  # NOSONAR
             """ Retrieves the value of a setting.
 
             :param str setting:  The name of the settings for which the value is retrieved.

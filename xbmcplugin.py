@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0
 
 from xbmcgui import ListItem
-from stub import KodiStub
-from colors import Colors
+from sakee.stub import KodiStub
+from sakee.colors import Colors
 
 
 SORT_METHOD_ALBUM = 14

@@ -5,7 +5,7 @@ import io
 import re
 import xbmc
 
-from stub import KodiStub
+from sakee.stub import KodiStub
 
 
 # noinspection PyPep8Naming,PyShadowingBuiltins
