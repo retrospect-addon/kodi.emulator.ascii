@@ -119,9 +119,9 @@ def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=0):  # NO
     """
 
     if isFolder:
-        print("*F: %s [%s]" % (KodiStub.replace_colors(str(listitem)), url))
+        print("*F: %s [%s]" % (KodiStub.replace_colors(listitem.__str__()), url))
     else:
-        print("*V: %s [%s]" % (KodiStub.replace_colors(str(listitem)), url))
+        print("*V: %s [%s]" % (KodiStub.replace_colors(listitem.__str__()), url))
 
     handle_info = __handle_info.get(handle, dict())
     handle_info["count"] = handle_info.get("count", 0) + 1
