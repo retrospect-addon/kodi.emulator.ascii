@@ -457,8 +457,8 @@ def getInfoLabel(infoTag):  # NOSONAR
     List of InfoTags - http://kodi.wiki/view/InfoLabels
     """
 
-    if infoTag == "system.buildversion":
-        return "18.1 Git:20160424-c327c53"
+    if infoTag.lower() == "system.buildversion":
+        return "19.0 Git:20200626-xxxxxxxxxx"
 
     return "InfoLabel:{}".format(infoTag)
 
