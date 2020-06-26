@@ -309,7 +309,7 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
 
     See https://codedocs.xyz/xbmc/xbmc/namespace_j_s_o_n_r_p_c.html
     """
-    from jsonrpc import JsonRpcApi
+    from sakeejsonrpc import JsonRpcApi
 
     json_data = json.loads(jsonrpccommand)
     try:

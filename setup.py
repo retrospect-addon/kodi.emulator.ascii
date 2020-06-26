@@ -17,7 +17,7 @@ setup(
     long_description_content_type="text/markdown",
     keywords='Kodi, emulator, ascii',
     license='GPL-3.0',
-    py_modules=["xbmc", "xbmcgui", "xbmcaddon", "xbmcgui", "colors", "inputstreamhelper", "stub", "xbmcplugin"],
+    py_modules=["xbmc", "xbmcgui", "xbmcaddon", "xbmcgui", "colors", "inputstreamhelper", "stub", "xbmcplugin", "sakeejsonrpc"],
     project_urls={
         'Documentation': 'https://github.com/retrospect-addon/kodi.emulator.ascii/blob/master/README.md',
         'Source': 'https://github.com/retrospect-addon/kodi.emulator.ascii/',
