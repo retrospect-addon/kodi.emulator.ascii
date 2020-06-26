@@ -309,12 +309,12 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
 
     See https://codedocs.xyz/xbmc/xbmc/namespace_j_s_o_n_r_p_c.html
     """
-    from sakeejsonrpc import JsonRpcApi
+    from sakejsonrpc import JsonRpcApi
 
     json_data = json.loads(jsonrpccommand)
     try:
         # Implement some methods for real
-        return JsonRpcApi().handle(json_data)
+        return json.dumps(JsonRpcApi().handle(json_data))
 
     except NotImplementedError:
         # Fallback to stubs
@@ -325,7 +325,7 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
         raise ValueError(
             "Could not find JSON Response folder. Use the environment variable KODI_STUB_RPC_RESPONSES to set one")
 
-    path = "{}.json".format(os.path.join(os.path.join(json_responses, json_data["method"].lower())))
+    path = "{}.json".format(os.path.join(json_responses, json_data["method"].lower()))
     if os.path.isfile(path):
         with io.open(path, mode='r', encoding='utf-8') as fd:
             stub_content = json.loads(fd.read())

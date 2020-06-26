@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0
+
 import io
-import json
 import os
 import re
 
@@ -8,7 +8,6 @@ import xbmc
 
 
 class JsonRpcApi(object):
-
     __ADDON_INFO = None
 
     def __init__(self):
@@ -21,30 +20,32 @@ class JsonRpcApi(object):
 
         :param obj json_data: The JSON RPC request.
 
+        :return: The JSON RPC reply.
+        :rtype: dict
         """
-        (namespace, method_name) = json_data["method"].split('.')
+        (class_name, method_name) = json_data["method"].split('.')
 
         # Find class
         try:
-            class_ = getattr(JsonRpcApi, namespace)
+            class_reference = getattr(JsonRpcApi, class_name)
         except AttributeError:
             raise NotImplementedError
 
         # Find method
-        instance = class_(JsonRpcApi.__ADDON_INFO)
+        class_instance = class_reference(JsonRpcApi.__ADDON_INFO)
         try:
-            method_ = getattr(instance, method_name)
+            method_reference = getattr(class_instance, method_name)
         except AttributeError:
             raise NotImplementedError
 
         # Invoke method
-        result = method_(**json_data["params"])
+        result = method_reference(**json_data["params"])
 
-        return json.dumps(dict(
+        return dict(
             id=0,
             jsonrpc='2.0',
             result=result,
-        ))
+        )
 
     class Settings(object):
         """ Allows manipulation of Kodi settings. """
@@ -54,7 +55,6 @@ class JsonRpcApi(object):
             """ Initialise the JSON RPC API Settings Namespace.
 
             :param obj addon_info:   Information about the current Add-on paths.
-
             """
             self._ADDON_INFO = addon_info
 
@@ -69,7 +69,7 @@ class JsonRpcApi(object):
 
         # noinspection PyPep8Naming
         def GetSettingValue(self, setting):
-            """ Retrieves the value of a setting
+            """ Retrieves the value of a setting.
 
             :param str setting:  The name of the settings for which the value is retrieved.
 
