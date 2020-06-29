@@ -339,11 +339,11 @@ class ListItem(KodiStub):
                 value = "%s    - %s: %s\n" % (value, key, self.__properties[key])
 
             if self.PY2:
-                return value.encode('utf-8') if type(value) == unicode else value
+                return value.encode('utf-8') if isinstance(value, unicode) else value
             return value
         else:
             if self.PY2:
-                return self.__label.encode('utf-8') if type(self.__label) == unicode else self.__label
+                return self.__label.encode('utf-8') if isinstance(self.__label, unicode) else self.__label
             return self.__label
 
     def __unicode__(self):
