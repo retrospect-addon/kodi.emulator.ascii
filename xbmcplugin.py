@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0
 
-from xbmc import Player
 from xbmcgui import ListItem
 from sakee.stub import KodiStub
 from sakee.colors import Colors
@@ -258,6 +257,7 @@ def setResolvedUrl(handle, succeeded, listitem):  # NOSONAR
     :param ListItem listitem:   Item the file plugin resolved to for playback.
 
     """
+    from xbmc import Player
 
     if succeeded:
         KodiStub.print_line("Item resolved to: {}".format(listitem), color=Colors.Blue)
