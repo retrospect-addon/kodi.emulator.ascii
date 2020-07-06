@@ -250,6 +250,8 @@ class PlayList(KodiStub):
 
 # noinspection PyPep8Naming,PyArgumentList
 class Player(KodiStub):
+    playing_file = None
+
     def __init__(self, *args, **kwargs):
         super(Player, self).__init__()
 
