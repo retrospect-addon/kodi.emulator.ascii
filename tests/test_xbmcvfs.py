@@ -19,7 +19,8 @@ class TestXbmcVfs(unittest.TestCase):
 
         # Now we write to it
         f = xbmcvfs.File(filename, 'w')
-        self.assertTrue(f.write(u'1234567890'))
+        self.assertTrue(f.write(u'1234'))
+        self.assertTrue(f.write('567890'))
         f.close()
         self.assertTrue(xbmcvfs.exists(filename))
 

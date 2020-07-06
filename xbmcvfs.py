@@ -15,7 +15,7 @@ class File(object):  # NOSONAR
         if flags not in ['r', 'w']:
             raise ValueError("flags should be 'r' or 'w'")
 
-        self._file = io.open(path, flags)
+        self._file = io.open(path, flags + 'b')
 
     def close(self):
         """ Close the file. """
