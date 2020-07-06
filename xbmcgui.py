@@ -107,7 +107,7 @@ class Dialog(KodiStub):
         return list(map(lambda index_value: int(index_value), selections.split(",")))[0]
 
     # noinspection PyUnusedLocal
-    def yesno(self, heading, message, nolabel="No", yeslabel="Yes", customlabel=None, autoclose=0):
+    def yesno(self, heading, message, nolabel=None, yeslabel=None, customlabel=None, autoclose=0):
         """ The Yes / No dialog can be used to inform the user about questions and get the answer.
 
         :param str heading:             Dialog heading.
@@ -121,6 +121,12 @@ class Dialog(KodiStub):
         :rtype: bool
 
         """
+
+        if nolabel is None:
+            nolabel = "No"
+
+        if yeslabel is None:
+            yeslabel = "Yes"
 
         self.print_heading(heading)
         question = "{} [{}]{} or [{}]{}:".format(message, yeslabel[0], yeslabel[1:], nolabel[0], nolabel[1:])
