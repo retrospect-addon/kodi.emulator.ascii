@@ -283,22 +283,24 @@ class Player(KodiStub):
         self.onAVStarted()
 
     def isPlaying(self):  # NOSONAR
-        # type: () -> bool
-        """
-        Check Kodi is playing something.
+        """ Check Kodi is playing something.
 
         :return: True if Kodi is playing a file.
+        :rtype: bool
         """
         return self.play_started
 
-    def onAVStarted(self):  # NOSONAR
-        # type: () -> None
+    def getPlayingFile(self):  # NOSONAR
+        """ Returns the current playing file as a string.
+
+        :return: The filename of the playing item.
+        :rtype: str
         """
-        onAVStarted method.
+        return Player.playing_file if self.play_started else None
 
+    def onAVStarted(self):  # NOSONAR
+        """ onAVStarted method.
         Will be called when Kodi has a video or audiostream.
-
-        New function added.
         """
         pass
 
