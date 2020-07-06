@@ -3,3 +3,4 @@
 .gitignore export-ignore
 requirements.txt export-ignore
 sake.png  export-ignore
+tests/ export-ignore

@@ -4,3 +4,5 @@ dist/*
 
 jsonrcpcommands/*.json
 *.pyc
+
+tests/data/test.txt
