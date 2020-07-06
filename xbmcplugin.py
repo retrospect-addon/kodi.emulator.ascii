@@ -257,11 +257,14 @@ def setResolvedUrl(handle, succeeded, listitem):  # NOSONAR
     :param ListItem listitem:   Item the file plugin resolved to for playback.
 
     """
+    from xbmc import Player
 
     if succeeded:
         KodiStub.print_line("Item resolved to: {}".format(listitem), color=Colors.Blue)
+        Player.playing_file = listitem.getPath()
     else:
         KodiStub.print_line("Item failed to resolve: {}".format(listitem), color=Colors.Red)
+        Player.playing_file = None
 
 
 # noinspection PyPep8Naming,PyUnusedLocal
