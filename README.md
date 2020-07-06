@@ -1,5 +1,6 @@
 # SAKÉ: Simple ASCII Kodi Emulator
 [![License](https://img.shields.io/github/license/retrospect-addon/kodi.emulator.ascii?color=brightgreen)](LICENSE.md)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/retrospect-addon/kodi.emulator.ascii/unit-tests/master)](https://github.com/retrospect-addon/kodi.emulator.ascii/actions?query=workflow%3Aunit-tests)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=retrospect-addon%3Akodi.emulator.ascii&metric=alert_status)](https://sonarcloud.io/dashboard?id=retrospect-addon%3Akodi.emulator.ascii)
 [![Python](https://img.shields.io/badge/python-2.7%20%7C%203.6-blue?logo=python)](https://kodi.tv/article/attention-addon-developers-migration-python-3)
 
