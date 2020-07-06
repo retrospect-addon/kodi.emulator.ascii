@@ -20,7 +20,8 @@ class TestXbmcVfs(unittest.TestCase):
         # Now we write to it
         f = xbmcvfs.File(filename, 'w')
         self.assertTrue(f.write(u'1234'))
-        self.assertTrue(f.write('567890'))
+        self.assertTrue(f.write('5678'))
+        self.assertTrue(f.write(b'90'))
         f.close()
         self.assertTrue(xbmcvfs.exists(filename))
 
@@ -36,7 +37,7 @@ class TestXbmcVfs(unittest.TestCase):
             self.assertEqual(f.seek(4), 4)
             self.assertEqual(f.seek(0), 0)
             self.assertEqual(f.read(4), '1234')
-            self.assertEqual(f.readBytes(4), '5678')
+            self.assertEqual(f.readBytes(4), b'5678')
             self.assertEqual(f.tell(), 8)
 
     def test_dir(self):

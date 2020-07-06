@@ -78,7 +78,11 @@ class File(object):  # NOSONAR
         :return: True if successful
         :rtype bool
         """
-        return self._file.write(buffer) == len(buffer)
+        if isinstance(buffer, bytes):
+            bytes_written = self._file.write(buffer)
+        else:
+            bytes_written = self._file.write(buffer.encode())
+        return bytes_written == len(buffer)
 
     def __enter__(self):
         return self
