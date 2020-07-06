@@ -8,20 +8,19 @@
 ## _SAKÉ_: your favourite 'drink' for debugging and developing Kodi Python add-ons
 SAKÉ can help you to debug and develop Kodi Python add-ons. It contains a set of libraries that try to mimic the functionality of the corresponding Kodi modules:
 
-| Module        | Purpose                   |
-|---------------|---------------------------|
-|`xbmc`         | General functions on Kodi |
-|`xbmcaddon`    | Kodi’s addon class        |
-|`xbmcgui`      | GUI functions on Kodi.    |
-|`xbmcplugin`   | Plugin functions on Kodi. |
-
+| Module       | Purpose                                |
+|--------------|----------------------------------------|
+| `xbmc`       | General functions on Kodi              |
+| `xbmcaddon`  | Kodi’s addon class                     |
+| `xbmcgui`    | GUI functions on Kodi.                 |
+| `xbmcplugin` | Plugin functions on Kodi.              |
+| `xbmcvfs`    | Virtual file system functions on Kodi. |
 
 Not all libraries are present and certainly not all methods are implemented. Currently missing are:
 
-| Module        | Purpose                   |
-|---------------|---------------------------|
-|`xbmcvfs`      | Virtual file system functions on Kodi.|
-|`xbmcdrm`      | Kodi’s DRM class          |
+| Module    | Purpose           |
+|-----------|-------------------|
+| `xbmcdrm` | Kodi’s DRM class. |
 
 Feel free to contribute to the completion using Pull Requests for this repository.
 

@@ -7,4 +7,4 @@ if sys.version_info[0] == 2:
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
-__all__ = ["test_unicode"]
+__all__ = ["test_unicode", "test_xbmcvfs"]
