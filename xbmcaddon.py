@@ -45,13 +45,10 @@ class Addon(KodiStub):
         :rtype: str
 
         """
-
         if id in self.__settings:
             return self.__settings[id]
         else:
-            return None
-            # Or we raise an error?
-            # raise ValueError("Cannot find setting '%s'" % (setting_id, ))
+            return ''
 
     def getSettingBool(self, id):
         """ Returns the value of a setting as a boolean.
