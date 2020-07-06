@@ -84,8 +84,13 @@ class Monitor(KodiStub):
 
         """
 
-        time.sleep(seconds)
-        return self.__abort
+        deadline = time.time() + seconds
+        while time.time() < deadline:
+            if self.__abort:
+                return True
+            time.sleep(0.1)  # Sleep 100ms
+
+        return False
 
 
 # noinspection PyPep8Naming
