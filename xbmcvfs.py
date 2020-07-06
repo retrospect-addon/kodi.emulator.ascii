@@ -21,6 +21,7 @@ class File(object):  # NOSONAR
         """ Close the file. """
         self._file.close()
 
+    # noinspection PyShadowingBuiltins
     def read(self, bytes=-1):
         """ Read from the file.
 
@@ -29,6 +30,7 @@ class File(object):  # NOSONAR
         :return: The read bytes
         :rtype: str
         """
+        # noinspection PyUnresolvedReferences
         return self._file.read(bytes).decode('utf-8')
 
     # noinspection PyPep8Naming
@@ -42,6 +44,7 @@ class File(object):  # NOSONAR
         """
         return self._file.read(numbytes)
 
+    # noinspection PyPep8Naming
     def seek(self, seekBytes, iWhence=0):  # NOSONAR
         """ Seek to position in file.
 
@@ -73,14 +76,16 @@ class File(object):  # NOSONAR
     def write(self, buffer):
         """ Write to the file.
 
-        :param str buffer:      Data to write to the file
+        :param str|byte buffer:      Data to write to the file
 
         :return: True if successful
         :rtype bool
         """
         if isinstance(buffer, bytes):
+            # noinspection PyTypeChecker
             bytes_written = self._file.write(buffer)
         else:
+            # noinspection PyTypeChecker
             bytes_written = self._file.write(buffer.encode())
         return bytes_written == len(buffer)
 
