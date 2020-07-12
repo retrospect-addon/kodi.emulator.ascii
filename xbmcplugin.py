@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0
 
-from xbmcgui import ListItem
-from sakee.stub import KodiStub
 from sakee.colors import Colors
-
+from sakee.stub import KodiStub
+from xbmcgui import ListItem
 
 SORT_METHOD_ALBUM = 14
 SORT_METHOD_ALBUM_IGNORE_THE = 15
@@ -261,10 +260,9 @@ def setResolvedUrl(handle, succeeded, listitem):  # NOSONAR
 
     if succeeded:
         KodiStub.print_line("Item resolved to: {}".format(listitem), color=Colors.Blue)
-        Player.playing_file = listitem.getPath()
+        Player.kodi_player().playResolvedItem(listitem.getPath(), listitem)
     else:
         KodiStub.print_line("Item failed to resolve: {}".format(listitem), color=Colors.Red)
-        Player.playing_file = None
 
 
 # noinspection PyPep8Naming,PyUnusedLocal

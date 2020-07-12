@@ -189,7 +189,7 @@ class ListItem(KodiStub):
         self.__subtitles = []
 
         # store properties
-        self.__properties = {}
+        self.__properties = {"path": path}
 
     def setIconImage(self, icon):  # NOSONAR
         raise DeprecationWarning("No more setIconImage: http://kodi.wiki/view/Jarvis_API_changes")
@@ -330,7 +330,7 @@ class ListItem(KodiStub):
         :rtype: str
         """
 
-        return self.__path or ""
+        return self.__path or self.getProperty("path") or ""
 
     def __str__(self):
         if KodiStub.is_verbose:
