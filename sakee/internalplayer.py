@@ -9,6 +9,21 @@ class KodiInteralPlayer(KodiStub):  # NOSONAR
     STATUS_STOPPED = 'stopped'
     STATUS_PLAYING = 'playing'
     STATUS_PAUSED = 'paused'
+    __kodi_player = None
+
+    @staticmethod
+    def instance():
+        """ The Kodi player instance
+
+        :return: The stub for the internal Kodi player
+        :rtype: KodiInteralPlayer
+
+        """
+
+        if KodiInteralPlayer.__kodi_player is None:
+            KodiInteralPlayer.__kodi_player = KodiInteralPlayer()
+
+        return KodiInteralPlayer.__kodi_player
 
     def __init__(self):
         super(KodiInteralPlayer, self).__init__()

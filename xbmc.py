@@ -249,31 +249,15 @@ class PlayList(KodiStub):
 
 # noinspection PyPep8Naming,PyArgumentList
 class Player(KodiStub):
-    __kodi_player = None
-
-    @staticmethod
-    def kodi_player():
-        """ The Kodi player instance
-
-        :return: The stub for the internal Kodi player
-        :rtype: KodiInteralPlayer
-
-        """
-
-        if Player.__kodi_player is None:
-            Player.__kodi_player = KodiInteralPlayer()
-
-        return Player.__kodi_player
-
     def __init__(self):
         super(Player, self).__init__()
 
         # register this player with the main Kodi player
-        Player.kodi_player().register_player(self)
+        KodiInteralPlayer.instance().register_player(self)
 
     def __del__(self):
         # unregister
-        Player.kodi_player().unregister_player(self)
+        KodiInteralPlayer.instance().unregister_player(self)
 
     def getAvailableAudioStreams(self):  # NOSONAR
         """ Returns the available audio stream names.
@@ -313,7 +297,7 @@ class Player(KodiStub):
 
         """
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_STOPPED:
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
             raise Exception('Player is not playing a file.')
 
         return None  # Not implemented
@@ -326,7 +310,7 @@ class Player(KodiStub):
 
         """
 
-        return Player.kodi_player().file
+        return KodiInteralPlayer.instance().file
 
     def getRadioRDSInfoTag(self):
         """ Return the Radio RDS info tag.
@@ -335,7 +319,7 @@ class Player(KodiStub):
         :rtype: RadioRDSInfoTag|None
         """
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_STOPPED:
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
             raise Exception('Player is not playing a file.')
 
         return None  # Not implemented
@@ -357,7 +341,7 @@ class Player(KodiStub):
         :rtype: int
         """
 
-        return Player.kodi_player().current_time
+        return KodiInteralPlayer.instance().current_time
 
     def getTotalTime(self):
         """ Return the total playing time.
@@ -367,10 +351,10 @@ class Player(KodiStub):
 
         """
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_STOPPED:
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
             raise Exception('Player is not playing a file.')
 
-        return Player.kodi_player().total_time
+        return KodiInteralPlayer.instance().total_time
 
     def getVideoInfoTag(self):
         """ Return the video info tag.
@@ -380,7 +364,7 @@ class Player(KodiStub):
 
         """
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_STOPPED:
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
             raise Exception('Player is not playing a file.')
 
         return None  # Not implemented
@@ -403,7 +387,7 @@ class Player(KodiStub):
 
         """
 
-        return Player.kodi_player().status == KodiInteralPlayer.STATUS_PLAYING
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
 
     def isPlayingAudio(self):  # NOSONAR
         """ Check for playing audio.
@@ -413,7 +397,7 @@ class Player(KodiStub):
 
         """
 
-        return Player.kodi_player().status == KodiInteralPlayer.STATUS_PLAYING
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
 
     def isPlayingRDS(self):  # NOSONAR
         """ Check for playing radio data system (RDS).
@@ -423,7 +407,7 @@ class Player(KodiStub):
 
         """
 
-        return Player.kodi_player().status == KodiInteralPlayer.STATUS_PLAYING
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
 
     def isPlayingVideo(self):  # NOSONAR
         """ Check for playing video.
@@ -433,21 +417,21 @@ class Player(KodiStub):
 
         """
 
-        return Player.kodi_player().status == KodiInteralPlayer.STATUS_PLAYING
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
 
     def pause(self):  # NOSONAR
         """ Pause or resume playing if already paused. """
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_STOPPED:
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
             return
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_PLAYING:
-            Player.kodi_player().status = KodiInteralPlayer.STATUS_PAUSED
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING:
+            KodiInteralPlayer.instance().status = KodiInteralPlayer.STATUS_PAUSED
             self.onPlayBackPaused()
             return
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_PAUSED:
-            Player.kodi_player().status = KodiInteralPlayer.STATUS_PLAYING
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PAUSED:
+            KodiInteralPlayer.instance().status = KodiInteralPlayer.STATUS_PLAYING
             self.onPlayBackResumed()
             return
 
@@ -468,7 +452,7 @@ class Player(KodiStub):
         """
         # Stop playing the current file (if any)
         self.stop()
-        Player.kodi_player().play(item)
+        KodiInteralPlayer.instance().play(item)
 
     def playnext(self):  # NOSONAR
         """ Play next item in playlist."""
@@ -499,10 +483,10 @@ class Player(KodiStub):
 
         """
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_STOPPED:
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
             raise Exception('Player is not playing a file.')
 
-        Player.kodi_player().current_time = seekTime
+        KodiInteralPlayer.instance().current_time = seekTime
         self.onPlayBackSeek(seekTime, 0)
 
     def setAudioStream(self, stream):  # NOSONAR
@@ -553,11 +537,11 @@ class Player(KodiStub):
     def stop(self):  # NOSONAR
         """ Stop playing."""
 
-        Player.kodi_player().status = KodiInteralPlayer.STATUS_STOPPED
-        Player.kodi_player().current_time = 0
-        Player.kodi_player().total_time = 0
-        Player.kodi_player().file = None
-        Player.kodi_player().set_events()
+        KodiInteralPlayer.instance().status = KodiInteralPlayer.STATUS_STOPPED
+        KodiInteralPlayer.instance().current_time = 0
+        KodiInteralPlayer.instance().total_time = 0
+        KodiInteralPlayer.instance().file = None
+        KodiInteralPlayer.instance().set_events()
 
     # noinspection PyUnusedLocal
     def updateInfoTag(self, item):  # NOSONAR
@@ -567,7 +551,7 @@ class Player(KodiStub):
 
         """
 
-        if Player.kodi_player().status == KodiInteralPlayer.STATUS_STOPPED:
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
             raise Exception('Player is not playing a file.')
 
         # Not implemented

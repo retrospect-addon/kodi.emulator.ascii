@@ -256,11 +256,12 @@ def setResolvedUrl(handle, succeeded, listitem):  # NOSONAR
     :param ListItem listitem:   Item the file plugin resolved to for playback.
 
     """
-    from xbmc import Player
+
+    from sakee.internalplayer import KodiInteralPlayer
 
     if succeeded:
         KodiStub.print_line("Item resolved to: {}".format(listitem), color=Colors.Blue)
-        Player.kodi_player().playResolvedItem(listitem.getPath(), listitem)
+        KodiInteralPlayer.instance().playResolvedItem(listitem.getPath(), listitem)
     else:
         KodiStub.print_line("Item failed to resolve: {}".format(listitem), color=Colors.Red)
 
