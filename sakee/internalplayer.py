@@ -38,8 +38,12 @@ class KodiInteralPlayer(KodiStub):  # NOSONAR
         # Keep track of players
         self.__players = []
 
-    # noinspection PyPep8Naming,PyUnusedLocal
-    def playResolvedItem(self, path, item):  # NOSONAR
+        # The play thread
+        self.__play_thread = None
+        self.__kill_play_thread = False
+
+    # noinspection PyUnusedLocal
+    def play_resolved_item(self, path, item):  # NOSONAR
         """ Sets the resolved item to play
 
         :param str path:
@@ -57,8 +61,27 @@ class KodiInteralPlayer(KodiStub):  # NOSONAR
         self._stop_event.clear()
 
         # Start the playback simulation thread
-        background_thread = threading.Thread(target=self.__loop)
-        background_thread.start()
+        self.__play_thread = threading.Thread(target=self.__loop)
+        self.__play_thread.start()
+
+    def stop_playback(self, force=False):
+        """ Stops playback. If `force=True` no stop events are raised.
+
+        :param bool force:      Force stops the player.
+
+        """
+
+        if self.__play_thread is None:
+            return
+
+        if force and self.__play_thread:
+            self.__kill_play_thread = True
+            return
+
+        self._stop_event.set()
+        self.__play_thread.join(2)
+        self.__play_thread = None
+        self.__kill_play_thread = False
 
     def register_player(self, player):
         """ Register a xbmc.Player instance
@@ -78,9 +101,6 @@ class KodiInteralPlayer(KodiStub):  # NOSONAR
 
         self.__players.remove(player)
 
-    def set_events(self):
-        self._stop_event.set()
-
     def __loop(self):
         """ Background playback loop. """
         from datetime import timedelta
@@ -89,6 +109,9 @@ class KodiInteralPlayer(KodiStub):  # NOSONAR
             player.onPlayBackStarted()
 
         while not self._stop_event.wait(1):
+            if self.__kill_play_thread:
+                return
+
             KodiStub.print_line(
                 'Player: [{status}] {pos}/{total}'.format(
                     status=self.status,

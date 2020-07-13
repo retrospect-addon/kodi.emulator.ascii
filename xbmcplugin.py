@@ -2,6 +2,7 @@
 
 from sakee.colors import Colors
 from sakee.stub import KodiStub
+from sakee.internalplayer import KodiInteralPlayer
 from xbmcgui import ListItem
 
 SORT_METHOD_ALBUM = 14
@@ -183,6 +184,9 @@ def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True
             updateListing
         ), align_right=True)
 
+    # In case there was something playing force to stop it now.
+    KodiInteralPlayer.instance().stop_playback(force=True)
+
 
 # noinspection PyPep8Naming,PyUnusedLocal
 def addSortMethod(handle, sortMethod, label2Mask="%D"):  # NOSONAR
@@ -257,11 +261,9 @@ def setResolvedUrl(handle, succeeded, listitem):  # NOSONAR
 
     """
 
-    from sakee.internalplayer import KodiInteralPlayer
-
     if succeeded:
         KodiStub.print_line("Item resolved to: {}".format(listitem), color=Colors.Blue)
-        KodiInteralPlayer.instance().playResolvedItem(listitem.getPath(), listitem)
+        KodiInteralPlayer.instance().play_resolved_item(listitem.getPath(), listitem)
     else:
         KodiStub.print_line("Item failed to resolve: {}".format(listitem), color=Colors.Red)
 

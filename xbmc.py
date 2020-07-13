@@ -541,7 +541,7 @@ class Player(KodiStub):
         KodiInteralPlayer.instance().current_time = 0
         KodiInteralPlayer.instance().total_time = 0
         KodiInteralPlayer.instance().file = None
-        KodiInteralPlayer.instance().set_events()
+        KodiInteralPlayer.instance().stop_playback()
 
     # noinspection PyUnusedLocal
     def updateInfoTag(self, item):  # NOSONAR
