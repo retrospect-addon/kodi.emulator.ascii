@@ -75,7 +75,8 @@ class Dialog(KodiStub):
             self.print_line("{} ) {}".format(i, options[i]))
             selections.append(str(i))
         self.print_line("=" * 120, color=Colors.Yellow)
-        selections = self.read_input("What items to select (%s)? " % (",".join(selections)), color=Colors.Yellow).lower()
+        selections = self.read_input("What items to select (%s)? " % (",".join(selections)),
+                                     color=Colors.Yellow).lower()
         if not selections:
             return None
         return list(map(lambda index_value: int(index_value), selections.split(",")))
@@ -189,7 +190,7 @@ class ListItem(KodiStub):
         self.__subtitles = []
 
         # store properties
-        self.__properties = {}
+        self.__properties = {"path": path}
 
     def setIconImage(self, icon):  # NOSONAR
         raise DeprecationWarning("No more setIconImage: http://kodi.wiki/view/Jarvis_API_changes")
@@ -330,7 +331,7 @@ class ListItem(KodiStub):
         :rtype: str
         """
 
-        return self.__path or ""
+        return self.__path or self.getProperty("path") or ""
 
     def __str__(self):
         if KodiStub.is_verbose:
@@ -390,7 +391,7 @@ class DialogProgress(KodiStub):
 
     def close(self):
         """ Close the progress dialog. """
-        self.print_line("="*120, color=Colors.Yellow)
+        self.print_line("=" * 120, color=Colors.Yellow)
 
     def iscanceled(self):
         """ Checks progress is canceled. """
