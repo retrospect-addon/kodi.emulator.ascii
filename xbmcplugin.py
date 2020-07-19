@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0
 
-from xbmcgui import ListItem
-from sakee.stub import KodiStub
 from sakee.colors import Colors
-
+from sakee.internalplayer import KodiInteralPlayer
+from sakee.stub import KodiStub
+from xbmcgui import ListItem
 
 SORT_METHOD_ALBUM = 14
 SORT_METHOD_ALBUM_IGNORE_THE = 15
@@ -184,6 +184,9 @@ def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True
             updateListing
         ), align_right=True)
 
+    # In case there was something playing force to stop it now.
+    KodiInteralPlayer.instance().stop_playback(force=True)
+
 
 # noinspection PyPep8Naming,PyUnusedLocal
 def addSortMethod(handle, sortMethod, label2Mask="%D"):  # NOSONAR
@@ -257,14 +260,12 @@ def setResolvedUrl(handle, succeeded, listitem):  # NOSONAR
     :param ListItem listitem:   Item the file plugin resolved to for playback.
 
     """
-    from xbmc import Player
 
     if succeeded:
         KodiStub.print_line("Item resolved to: {}".format(listitem), color=Colors.Blue)
-        Player.playing_file = listitem.getPath()
+        KodiInteralPlayer.instance().play_resolved_item(listitem.getPath(), listitem)
     else:
         KodiStub.print_line("Item failed to resolve: {}".format(listitem), color=Colors.Red)
-        Player.playing_file = None
 
 
 # noinspection PyPep8Naming,PyUnusedLocal

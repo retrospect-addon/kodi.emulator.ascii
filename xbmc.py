@@ -2,16 +2,15 @@
 
 import io
 import json
-import threading
-import time
 import os
 import signal
+import time
 from collections import namedtuple
 
-from xbmcgui import ListItem
-
 from sakee.colors import Colors
+from sakee.internalplayer import KodiInteralPlayer
 from sakee.stub import KodiStub
+from xbmcgui import ListItem
 
 DRIVE_NOT_READY = 1
 ENGLISH_NAME = 2
@@ -40,10 +39,10 @@ TRAY_OPEN = 16
 
 # Custom AddonData type
 AddonData = namedtuple('AddonData', [
-    'kodi_home_path',       # data path (either portable of user path)
-    'add_on_id',            # the add-on id
-    'add_on_path',          # the full path to the add-on
-    'kodi_profile_path'     # the full path to the add-on profile folder
+    'kodi_home_path',  # data path (either portable of user path)
+    'add_on_id',  # the add-on id
+    'add_on_path',  # the full path to the add-on
+    'kodi_profile_path'  # the full path to the add-on profile folder
 ])
 
 
@@ -230,7 +229,7 @@ class PlayList(KodiStub):
 
     def add(self, url, listitem=None, index=None):
         """`Adds a new file to the playlist.
-        
+
         :param str url:                 Filename or url to add.
         :param ListItem|None listitem:  Used with setInfo() to set different infolabels.
         :param int|None index:          Position to add playlist item. (default=end)
@@ -250,24 +249,195 @@ class PlayList(KodiStub):
 
 # noinspection PyPep8Naming,PyArgumentList
 class Player(KodiStub):
-    playing_file = None
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         super(Player, self).__init__()
 
-        self.Init(*args, **kwargs)
-        self.play_started = False
+        # register this player with the main Kodi player
+        KodiInteralPlayer.instance().register_player(self)
 
-        def play_start():
-            self.play_started = True
-            self.onAVStarted()
+    def __del__(self):
+        # unregister
+        KodiInteralPlayer.instance().unregister_player(self)
 
-        timer = threading.Timer(2.0, play_start)
-        timer.start()
+    def getAvailableAudioStreams(self):  # NOSONAR
+        """ Returns the available audio stream names.
+
+        :return: The available audio streams.
+        :rtype: List[str]
+
+        """
+
+        return []  # Not implemented
+
+    def getAvailableSubtitleStreams(self):  # NOSONAR
+        """ Returns the available subtitle stream names.
+
+        :return: The available subtitle streams.
+        :rtype: List[str]
+
+        """
+
+        return []  # Not implemented
+
+    def getAvailableVideoStreams(self):  # NOSONAR
+        """ Returns the available video stream names.
+
+        :return: The available video streams.
+        :rtype: List[str]
+
+        """
+
+        return []  # Not implemented
+
+    def getMusicInfoTag(self):
+        """ Return the music info tag.
+
+        :return: Returns the MusicInfoTag of the current playing 'Song'.
+        :rtype: MusicInfoTag|None
+
+        """
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
+            raise Exception('Player is not playing a file.')
+
+        return None  # Not implemented
+
+    def getPlayingFile(self):  # NOSONAR
+        """ Returns the current playing file as a string.
+
+        :return: The filename of the playing item.
+        :rtype: str
+
+        """
+
+        return KodiInteralPlayer.instance().file
+
+    def getRadioRDSInfoTag(self):
+        """ Return the Radio RDS info tag.
+
+        :return: Returns the RadioRDSInfoTag of the current playing 'Radio Song if. present'.
+        :rtype: RadioRDSInfoTag|None
+        """
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
+            raise Exception('Player is not playing a file.')
+
+        return None  # Not implemented
+
+    def getSubtitles(self):
+        """ Return the subtitle stream name.
+
+        :return: Stream name
+        :rtype: str
+
+        """
+
+        return ''  # Not implemented
+
+    def getTime(self):
+        """ Return the current playing time.
+
+        :return: Returns the current time of the current playing media as fractional seconds.
+        :rtype: int
+        """
+
+        return KodiInteralPlayer.instance().current_time
+
+    def getTotalTime(self):
+        """ Return the total playing time.
+
+        :return: Returns the total time of the current playing media in seconds. This is only accurate to the full second.
+        :rtype: int
+
+        """
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
+            raise Exception('Player is not playing a file.')
+
+        return KodiInteralPlayer.instance().total_time
+
+    def getVideoInfoTag(self):
+        """ Return the video info tag.
+
+        :return: The VideoInfoTag of the current playing Movie.
+        :rtype: VideoInfoTag|None
+
+        """
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
+            raise Exception('Player is not playing a file.')
+
+        return None  # Not implemented
+
+    def isExternalPlayer(self):
+        """ Check for external player.
+
+        :return: True if kodi is playing using an external player.
+        :rtype: bool
+
+        """
+
+        return False
+
+    def isPlaying(self):  # NOSONAR
+        """ Check Kodi is playing something.
+
+        :return: True if Kodi is playing a file.
+        :rtype: bool
+
+        """
+
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
+
+    def isPlayingAudio(self):  # NOSONAR
+        """ Check for playing audio.
+
+        :return: True if Kodi is playing an audio file.
+        :rtype: bool
+
+        """
+
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
+
+    def isPlayingRDS(self):  # NOSONAR
+        """ Check for playing radio data system (RDS).
+
+        :return: True if kodi is playing a radio data system (RDS).
+        :rtype: bool
+
+        """
+
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
+
+    def isPlayingVideo(self):  # NOSONAR
+        """ Check for playing video.
+
+        :return: True if Kodi is playing a video.
+        :rtype: bool
+
+        """
+
+        return KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING
+
+    def pause(self):  # NOSONAR
+        """ Pause or resume playing if already paused. """
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
+            return
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PLAYING:
+            KodiInteralPlayer.instance().status = KodiInteralPlayer.STATUS_PAUSED
+            self.onPlayBackPaused()
+            return
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_PAUSED:
+            KodiInteralPlayer.instance().status = KodiInteralPlayer.STATUS_PLAYING
+            self.onPlayBackResumed()
+            return
 
     # noinspection PyUnusedLocal
     def play(self, item=None, listitem=None, windowed=False, startpos=-1):
-        """ Play a item.
+        """ Play an item.
 
         :param str|None item:            Filename, url or playlist
         :param ListItem|None listitem:   Used with setInfo() to set different infolabels.
@@ -280,31 +450,227 @@ class Player(KodiStub):
         Once you use a keyword, all following arguments require the keyword.
 
         """
+        # Stop playing the current file (if any)
+        self.stop()
+        KodiInteralPlayer.instance().play(item)
 
-        time.sleep(1)
-        self.onAVStarted()
+    def playnext(self):  # NOSONAR
+        """ Play next item in playlist."""
 
-    def isPlaying(self):  # NOSONAR
-        """ Check Kodi is playing something.
+        pass  # Not implemented
 
-        :return: True if Kodi is playing a file.
-        :rtype: bool
+    def playprevious(self):  # NOSONAR
+        """ Play previous item in playlist."""
+
+        pass  # Not implemented
+
+    def playselected(self, selected):  # NOSONAR
+        """ Set Audio Stream.
+
+        :param int selected:            Item to select
+
         """
-        return self.play_started
 
-    def getPlayingFile(self):  # NOSONAR
-        """ Returns the current playing file as a string.
+        pass  # Not implemented
 
-        :return: The filename of the playing item.
-        :rtype: str
+    def seekTime(self, seekTime):  # NOSONAR
+        """ Seek time.
+
+        Seeks the specified amount of time as fractional seconds.
+        The time specified is relative to the beginning of the currently. playing media file.
+
+        :param int seekTime:            Time to seek as fractional seconds
+
         """
-        return Player.playing_file if self.play_started else None
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
+            raise Exception('Player is not playing a file.')
+
+        KodiInteralPlayer.instance().current_time = seekTime
+        self.onPlayBackSeek(seekTime, 0)
+
+    def setAudioStream(self, stream):  # NOSONAR
+        """ Set Audio Stream.
+
+        :param int stream:              Audio stream to select for play
+
+        """
+
+        pass  # Not implemented
+
+    def setSubtitles(self, subtitleFile):  # NOSONAR
+        """ Set subtitle file and enable subtitles.
+
+        :param str subtitleFile:        File to use as source of subtitles
+
+        """
+
+        pass  # Not implemented
+
+    def setSubtitleStream(self, stream):  # NOSONAR
+        """ Set Subtitle Stream.
+
+        :param int stream:              Subtitle stream to select for play
+
+        """
+
+        pass  # Not implemented
+
+    def setVideoStream(self, stream):  # NOSONAR
+        """ Set Video Stream.
+
+        :param int stream:              Video stream to select for play
+
+        """
+
+        pass  # Not implemented
+
+    def showSubtitles(self, visible):  # NOSONAR
+        """ Enable / disable subtitles.
+
+        :param bool visible:            True for visible subtitles.
+
+        """
+
+        pass  # Not implemented
+
+    def stop(self):  # NOSONAR
+        """ Stop playing."""
+
+        KodiInteralPlayer.instance().status = KodiInteralPlayer.STATUS_STOPPED
+        KodiInteralPlayer.instance().current_time = 0
+        KodiInteralPlayer.instance().total_time = 0
+        KodiInteralPlayer.instance().file = None
+        KodiInteralPlayer.instance().stop_playback()
+
+    # noinspection PyUnusedLocal
+    def updateInfoTag(self, item):  # NOSONAR
+        """ Update info labels for currently playing item.
+
+        :param ListItem item:           ListItem with new info
+
+        """
+
+        if KodiInteralPlayer.instance().status == KodiInteralPlayer.STATUS_STOPPED:
+            raise Exception('Player is not playing a file.')
+
+        # Not implemented
+
+    def onAVChange(self):  # NOSONAR
+        """ onAVChange method.
+        Will be called when Kodi has a video, audio or subtitle stream. Also happens when the stream changes.
+
+        """
+
+        self.print_line('Invoked onAVChange()', verbose=True)
 
     def onAVStarted(self):  # NOSONAR
         """ onAVStarted method.
+
         Will be called when Kodi has a video or audiostream.
+
         """
-        pass
+
+        self.print_line('Invoked onAVStarted()', verbose=True)
+
+    def onPlaybackEnded(self):  # NOSONAR
+        """ onPlaybackEnded method.
+
+        Will be called when Kodi stops playing a file.
+
+        """
+        self.print_line('Invoked onPlaybackEnded()', verbose=True)
+
+    def onPlayBackError(self):  # NOSONAR
+        """ onPlayBackError method.
+
+        Will be called when playback stops due to an error.
+
+        """
+
+        self.print_line('Invoked onPlayBackError()', verbose=True)
+
+    def onPlayBackPaused(self):  # NOSONAR
+        """ onPlayBackPaused method.
+
+        Will be called when user pauses a playing file.
+
+        """
+
+        self.print_line('Invoked onPlayBackPaused()', verbose=True)
+
+    def onPlayBackResumed(self):  # NOSONAR
+        """ onPlayBackResumed method.
+
+        Will be called when user resumes a paused file.
+
+        """
+
+        self.print_line('Invoked onPlayBackResumed()', verbose=True)
+
+    def onPlayBackSeek(self, time, seekOffset):  # NOSONAR
+        """ onPlayBackSeek method.
+        Will be called when user seeks to a time.
+
+        :param int time:            Time to seek to
+        :param int seekOffset:      ?
+
+        """
+        self.print_line('Invoked onPlayBackSeek(%d, %d)' % (time, seekOffset), verbose=True)
+
+    def onPlayBackSeekChapter(self, chapter):  # NOSONAR
+        """ onPlayBackSeekChapter method.
+
+        Will be called when user performs a chapter seek.
+
+        :param int chapter:         Chapter to seek to
+
+        """
+
+        self.print_line('Invoked onPlayBackSeekChapter(%d)' % chapter, verbose=True)
+
+    def onPlayBackSpeedChanged(self, speed):  # NOSONAR
+        """ onPlayBackSpeedChanged method.
+
+        Will be called when players speed changes (eg. user FF/RW).
+
+        Negative speed means player is rewinding, 1 is normal playback speed.
+
+        :param int speed:           Current speed of player
+
+        """
+
+        self.print_line('Invoked onPlayBackSpeedChanged(%d)' % speed, verbose=True)
+
+    def onPlayBackStarted(self):  # NOSONAR
+        """ onPlayBackStarted method.
+
+        Will be called when Kodi player starts. Video or audio might not be available at this point.
+
+        Use onAVStarted() instead if you need to detect if Kodi is actually playing a media file
+        (i.e, if a stream is available).
+
+        """
+
+        self.print_line('Invoked onPlayBackStarted()', verbose=True)
+
+    def onPlayBackStopped(self):  # NOSONAR
+        """ onPlayBackStopped method.
+
+        Will be called when user stops Kodi playing a file.
+
+        """
+
+        self.print_line('Invoked onPlayBackStopped()', verbose=True)
+
+    def onQueueNextItem(self):  # NOSONAR
+        """ onQueueNextItem method.
+
+        Will be called when user queues the next item.
+
+        """
+
+        self.print_line('Invoked onQueueNextItem()', verbose=True)
 
 
 # noinspection PyPep8Naming
