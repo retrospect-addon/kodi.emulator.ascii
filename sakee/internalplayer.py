@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0
 
 import threading
-from .stub import KodiStub
+
+from sakee.stub import KodiStub
 
 
 class KodiInteralPlayer(KodiStub):  # NOSONAR
