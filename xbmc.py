@@ -122,7 +122,9 @@ class Keyboard(KodiStub):
 
         if not self.is_interactive:
             self.__confirmed = True
-            return "1234"
+            keyboard = self.get_keyboard_stub()
+            self.__input = keyboard.get_next_input()
+            return
 
         KodiStub.print_heading(self.__heading)
         try:

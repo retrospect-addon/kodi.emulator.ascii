@@ -3,17 +3,48 @@
 import os
 import re
 import sys
+import random
 
 from sakee.colors import Colors
 
 
+class KeyboardStub(object):
+    def __init__(self):
+        self.__id = random.random()
+        self.__queue = []
+        self.reset()
+
+    def add_input(self, line):
+        self.__queue.append(line)
+
+    def clear_input(self):
+        self.__queue = []
+
+    def get_next_input(self):
+        return self.__queue.pop(0)
+
+    def reset(self):
+        self.__queue = []
+        line = os.environ.get("KODI_STUB_INPUT", None)
+        if line:
+            self.__queue.append(line)
+
+
 class KodiStub(object):
+    __keyboard_stub = None
+
     is_interactive = os.environ.get("KODI_INTERACTIVE", "1") == "1"
     is_verbose = os.environ.get("KODI_STUB_VERBOSE", "0") == "1"
 
     def __init__(self):
         self.PY2 = sys.version_info[0] == 2
         self.PY3 = sys.version_info[0] == 3
+
+    def get_keyboard_stub(self):
+        if KodiStub.__keyboard_stub is None:
+            KodiStub.__keyboard_stub = KeyboardStub()
+
+        return KodiStub.__keyboard_stub
 
     def read_input(self, text, color=None):
         """ Reads user's input from the console

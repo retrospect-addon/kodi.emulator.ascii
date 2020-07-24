@@ -29,4 +29,5 @@ jobs:
       - name: Run unit tests
         run: |
           export KODI_HOME=$GITHUB_WORKSPACE/tests/home
+          export KODI_INTERACTIVE=0
           pytest -v --color=yes
