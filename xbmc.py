@@ -848,11 +848,11 @@ def getInfoLabel(infoTag):  # NOSONAR
 
 
 # noinspection PyPep8Naming,PyShadowingBuiltins,PyUnusedLocal
-def getLanguage(format=ISO_639_1, region=None):  # NOSONAR
+def getLanguage(format=ENGLISH_NAME, region=False):  # NOSONAR
     """ Get the active language.
 
     :param int format:          Format of the returned language string (see table)
-    :param str|None region:     append the region delimited by "-" of the language
+    :param bool region:         append the region delimited by "-" of the language
                                 (setting) to the returned language string
 
     :return: The active language as a string
@@ -870,9 +870,9 @@ def getLanguage(format=ISO_639_1, region=None):  # NOSONAR
     """
 
     if format == ISO_639_1:
-        return "en"
+        return "en" if not region else "en-gb"
     if format == ISO_639_2:
-        return "eng"
+        return "eng" if not region else "eng-gbr"
 
     return "English"
 
