@@ -797,7 +797,7 @@ def getCondVisibility(condition):  # NOSONAR
     :param str condition:   condition to check
 
     :return: True (1) or False (0) as a bool
-    :rtype: bool
+    :rtype: int
 
     List of Conditions - http://kodi.wiki/view/List_of_Boolean_Conditions
 
@@ -826,7 +826,7 @@ def getCondVisibility(condition):  # NOSONAR
         KodiStub.print_line("Missing condition: {}".format(condition), color=Colors.Yellow)
 
     KodiStub.print_line("Condition: {0}={1}".format(condition, result), color=Colors.Blue, verbose=True)
-    return result
+    return 1 if result else 0
 
 
 # noinspection PyPep8Naming
