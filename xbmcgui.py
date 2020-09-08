@@ -40,7 +40,7 @@ class Dialog(KodiStub):
         return True
 
     # noinspection PyUnusedLocal
-    def textviewer(self, heading, text, usemono):
+    def textviewer(self, heading, text, usemono=False):
         """ The text viewer dialog can be used to display descriptions, help texts or other larger texts.
 
         :param str heading:     Dialog heading.
@@ -49,9 +49,17 @@ class Dialog(KodiStub):
 
         """
 
+        text = self.replace_colors(text)
+        text = text.replace("\\n", "\n")
         self.print_heading(heading)
         self.print_line(text)
         self.print_line("=" * 120, color=Colors.Yellow)
+
+        if KodiStub.is_interactive:
+            self.read_input("OK?", color=Colors.Yellow)
+        else:
+            KodiStub.print_line("OK?", Colors.Yellow)
+        return True
 
     # noinspection PyPep8Naming,PyUnusedLocal
     def multiselect(self, heading, options, autoclose=0, preselect=None, useDetails=False):  # NOSONAR
