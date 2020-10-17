@@ -152,7 +152,7 @@ class KodiStub(object):
             else:
                 return Colors.EndColor
 
-        color_tag = re.sub(r'\[COLOR (\w+)\]', __color_replacer, color_tag)
+        color_tag = re.sub(r'\[COLOR (\w+)]', __color_replacer, color_tag)
         color_tag = color_tag.replace("[/COLOR]", Colors.EndColor)
         return color_tag
 

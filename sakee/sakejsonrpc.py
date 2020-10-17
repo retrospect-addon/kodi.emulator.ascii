@@ -4,7 +4,7 @@ import io
 import os
 import re
 
-import xbmc
+from sakee import addoninfo
 
 
 class JsonRpcApi(object):
@@ -13,7 +13,7 @@ class JsonRpcApi(object):
     def __init__(self):
         """ Initialise the JSON RPC API Implementation. """
         if JsonRpcApi.__ADDON_INFO is None:
-            JsonRpcApi.__ADDON_INFO = xbmc.get_add_on_info_from_calling_script()
+            JsonRpcApi.__ADDON_INFO = addoninfo.get_add_on_info_from_calling_script()
 
     def handle(self, json_data):
         """ Handle the JSON RPC Request

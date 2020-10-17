@@ -4,6 +4,10 @@ import io
 import os
 from shutil import copyfile
 
+from sakee import addoninfo
+from sakee.colors import Colors
+from sakee.stub import KodiStub
+
 
 class File(object):  # NOSONAR
     def __init__(self, path, flags='r'):
@@ -306,3 +310,64 @@ def validatePath(path):  # NOSONAR
     :rtype str
     """
     return os.path.normpath(path)
+
+
+# noinspection PyPep8Naming
+def translatePath(path):  # NOSONAR
+    """ Returns the translated path.
+
+    :param str path:    Path to format
+
+    :return: Translated path
+    :rtype: str
+
+    See http://kodi.wiki/view/Special_protocol
+
+    E.g:
+        special://home/ is mapped to: kodi/
+        special://profile/ is mapped to: kodi/userdata
+
+    Or in portable:
+        special://home/ is mapped to: kodi/portable_data/
+        special://profile/ is mapped to: kodi/portable_data/userdata
+
+    """
+
+    def get_return_path(base_path, name, *segments):
+        if not base_path:
+            raise ValueError("Missing __kodi_{}_path data".format(name))
+        new_path = os.path.join(base_path, *[i.replace("/", os.sep) for i in segments if i and i != ''])
+
+        if not os.path.exists(new_path):
+            raise ValueError("Invalid path specified: {}".format(path, ))
+
+        return new_path
+
+    if path.startswith("special://profile/"):
+        return_path = get_return_path(__add_on_info.kodi_profile_path,
+                                      "profile",
+                                      path.replace("special://profile/", ""))
+
+    elif path.startswith("special://home/"):
+        return_path = get_return_path(__add_on_info.kodi_home_path,
+                                      "home",
+                                      path.replace("special://home/", ""))
+
+    elif path.startswith("special://xbmcbin/"):
+        return_path = get_return_path(__add_on_info.kodi_home_path,
+                                      "home",
+                                      "system",
+                                      path.replace("special://xbmcbin/", ""))
+
+    elif os.path.isabs(path):
+        return path
+
+    else:
+        raise ValueError("Invalid special path: %s" % (path,))
+
+    actual_path = os.path.abspath(return_path)
+    KodiStub.print_line("Mapped '{0}' -> '{1}'".format(path, actual_path), color=Colors.Blue)
+    return actual_path
+
+
+__add_on_info = addoninfo.get_add_on_info_from_calling_script()

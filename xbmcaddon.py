@@ -3,8 +3,8 @@
 import os
 import io
 import re
-import xbmc
 
+from sakee import addoninfo
 from sakee.stub import KodiStub
 
 
@@ -17,7 +17,7 @@ class Addon(KodiStub):
 
         self.__add_on_id = id
         # Get some data from the path of the calling file
-        paths = xbmc.get_add_on_info_from_calling_script(id)
+        paths = addoninfo.get_add_on_info_from_calling_script(id)
         self.__kodi_home_path = paths.kodi_home_path
         self.__add_on_id = paths.add_on_id
         self.__add_on_path = paths.add_on_path
