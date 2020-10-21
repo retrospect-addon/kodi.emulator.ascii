@@ -21,6 +21,9 @@ class KeyboardStub(object):
         self.__queue = []
 
     def get_next_input(self):
+        if len(self.__queue) == 0:
+            return None
+
         return self.__queue.pop(0)
 
     def reset(self):
