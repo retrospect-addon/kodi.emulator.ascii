@@ -298,7 +298,7 @@ class Addon(KodiStub):
         setting_regex = r'id="([^"]+)"[^>]*default="([^"]*)"'
         results = re.findall(setting_regex, default_xml)
         if not results:
-            results = re.findall(r'setting id="(.*?)".*?<default>(.*?)<', default_xml, re.DOTALL)
+            results = re.findall(r'setting id="(.*?)".*?(?:<default>(.*?)<|<default\s*/>|<data)', default_xml, re.DOTALL)
         settings = {}
         for result in results:
             settings[result[0]] = result[1]
