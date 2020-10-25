@@ -125,34 +125,80 @@ def endOfDirectory(handle, succeeded=True, updateListing=False, cacheToDisc=True
 
 
 # noinspection PyPep8Naming,PyUnusedLocal
-def addSortMethod(handle, sortMethod, label2Mask="%D"):  # NOSONAR
+def addSortMethod(handle, sortMethod, labelMask="", label2Mask="%D"):  # NOSONAR
     """ Adds a sorting method for the media list.
 
     :param int handle:      Handle the plugin was started with.
     :param int sortMethod:  See available sort methods at the bottom (or see SortFileItem.h).
+    :param str labelMask:   The label mask to use for the first label.
     :param str label2Mask:  The label mask to use for the second label. Defaults to %D
     :return:
 
-    softMethod can have: SORT_METHOD_NONE, SORT_METHOD_LABEL, SORT_METHOD_LABEL_IGNORE_THE,
-    SORT_METHOD_DATE, SORT_METHOD_SIZE, SORT_METHOD_FILE, SORT_METHOD_DRIVE_TYPE,
-    SORT_METHOD_TRACKNUM, SORT_METHOD_DURATION, SORT_METHOD_TITLE, SORT_METHOD_TITLE_IGNORE_THE,
-    SORT_METHOD_ARTIST, SORT_METHOD_ARTIST_IGNORE_THE, SORT_METHOD_ALBUM,
-    SORT_METHOD_ALBUM_IGNORE_THE, SORT_METHOD_GENRE, xbmcplugin.SORT_SORT_METHOD_VIDEO_YEAR,
-    SORT_METHOD_YEAR, SORT_METHOD_VIDEO_RATING, SORT_METHOD_PROGRAM_COUNT,
-    SORT_METHOD_PLAYLIST_ORDER, SORT_METHOD_EPISODE, SORT_METHOD_VIDEO_TITLE,
-    SORT_METHOD_VIDEO_SORT_TITLE, SORT_METHOD_VIDEO_SORT_TITLE_IGNORE_THE,
-    SORT_METHOD_PRODUCTIONCODE, SORT_METHOD_SONG_RATING, SORT_METHOD_MPAA_RATING,
-    SORT_METHOD_VIDEO_RUNTIME, SORT_METHOD_STUDIO, SORT_METHOD_STUDIO_IGNORE_THE,
-    SORT_METHOD_UNSORTED, SORT_METHOD_BITRATE, SORT_METHOD_LISTENERS, SORT_METHOD_COUNTRY,
-    SORT_METHOD_DATEADDED, SORT_METHOD_FULLPATH, SORT_METHOD_LABEL_IGNORE_FOLDERS,
-    SORT_METHOD_LASTPLAYED, SORT_METHOD_PLAYCOUNT, SORT_METHOD_CHANNEL, SORT_METHOD_DATE_TAKEN,
-    SORT_METHOD_VIDEO_USER_RATING, SORT_METHOD_SONG_USER_RATING
+    sortMethod can have: SORT_METHOD_NONE, SORT_METHOD_LABEL, SORT_METHOD_LABEL_IGNORE_THE,
+        SORT_METHOD_DATE, SORT_METHOD_SIZE, SORT_METHOD_FILE, SORT_METHOD_DRIVE_TYPE,
+        SORT_METHOD_TRACKNUM, SORT_METHOD_DURATION, SORT_METHOD_TITLE, SORT_METHOD_TITLE_IGNORE_THE,
+        SORT_METHOD_ARTIST, SORT_METHOD_ARTIST_IGNORE_THE, SORT_METHOD_ALBUM,
+        SORT_METHOD_ALBUM_IGNORE_THE, SORT_METHOD_GENRE, xbmcplugin.SORT_SORT_METHOD_VIDEO_YEAR,
+        SORT_METHOD_YEAR, SORT_METHOD_VIDEO_RATING, SORT_METHOD_PROGRAM_COUNT,
+        SORT_METHOD_PLAYLIST_ORDER, SORT_METHOD_EPISODE, SORT_METHOD_VIDEO_TITLE,
+        SORT_METHOD_VIDEO_SORT_TITLE, SORT_METHOD_VIDEO_SORT_TITLE_IGNORE_THE,
+        SORT_METHOD_PRODUCTIONCODE, SORT_METHOD_SONG_RATING, SORT_METHOD_MPAA_RATING,
+        SORT_METHOD_VIDEO_RUNTIME, SORT_METHOD_STUDIO, SORT_METHOD_STUDIO_IGNORE_THE,
+        SORT_METHOD_UNSORTED, SORT_METHOD_BITRATE, SORT_METHOD_LISTENERS, SORT_METHOD_COUNTRY,
+        SORT_METHOD_DATEADDED, SORT_METHOD_FULLPATH, SORT_METHOD_LABEL_IGNORE_FOLDERS,
+        SORT_METHOD_LASTPLAYED, SORT_METHOD_PLAYCOUNT, SORT_METHOD_CHANNEL, SORT_METHOD_DATE_TAKEN,
+        SORT_METHOD_VIDEO_USER_RATING, SORT_METHOD_SONG_USER_RATING
 
-    label2Mask applies to: SORT_METHOD_NONE, SORT_METHOD_UNSORTED, SORT_METHOD_VIDEO_TITLE,
-        SORT_METHOD_TRACKNUM, SORT_METHOD_FILE, SORT_METHOD_TITLE, SORT_METHOD_TITLE_IGNORE_THE,
-        SORT_METHOD_LABEL, SORT_METHOD_LABEL_IGNORE_THE, SORT_METHOD_VIDEO_SORT_TITLE,
-        SORT_METHOD_FULLPATH, SORT_METHOD_VIDEO_SORT_TITLE_IGNORE_THE,
-        SORT_METHOD_LABEL_IGNORE_FOLDERS, SORT_METHOD_CHANNEL
+    labelMask applies to:
+        SORT_METHOD_TRACKNUM        - Defaults to [%N. ]%T)
+        SORT_METHOD_EPISODE         - Defaults to %H. %T
+        SORT_METHOD_PRODUCTIONCODE  - Defaults to %H. %T
+        All other sort methods      - Defaults to %T
+
+    label2Mask applies to:
+        SORT_METHOD_NONE, SORT_METHOD_UNSORTED, SORT_METHOD_VIDEO_TITLE, SORT_METHOD_TRACKNUM,
+        SORT_METHOD_FILE, SORT_METHOD_TITLE, SORT_METHOD_TITLE_IGNORE_THE, SORT_METHOD_LABEL,
+        SORT_METHOD_LABEL_IGNORE_THE, SORT_METHOD_VIDEO_SORT_TITLE, SORT_METHOD_FULLPATH,
+        SORT_METHOD_VIDEO_SORT_TITLE_IGNORE_THE, SORT_METHOD_LABEL_IGNORE_FOLDERS,
+        SORT_METHOD_CHANNEL         - All default to "%D"
+
+    Available metadata masks:
+
+     * %A - Artist
+     * %B - Album
+     * %C - Programs count
+     * %D - Duration
+     * %E - episode number
+     * %F - FileName
+     * %G - Genre
+     * %H - season*100+episode
+     * %I - Size
+     * %J - Date
+     * %K - Movie/Game title
+     * %L - existing Label
+     * %M - number of episodes
+     * %N - Track Number
+     * %O - mpaa rating
+     * %P - production code
+     * %Q - file time
+     * %R - Movie rating
+     * %S - Disc Number
+     * %T - Title
+     * %U - studio
+     * %V - Playcount
+     * %W - Listeners
+     * %X - Bitrate
+     * %Y - Year
+     * %Z - tvshow title
+     * %a - Date Added
+     * %b - Total number of discs
+     * %c - Relevance - Used for actors' appearances
+     * %d - Date and Time
+     * %e - Original release date
+     * %f - bpm
+     * %p - Last Played
+     * %r - User Rating
+     * %t - Date Taken (suitable for Pictures)
 
     """
 
