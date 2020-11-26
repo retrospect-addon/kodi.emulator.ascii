@@ -237,6 +237,7 @@ class Addon(KodiStub):
             parts = translation.split('"')
             msgs = [t for t in parts if t.strip()]
             translation = "".join(msgs)
+            translation = translation.replace("[CR]", "\n")
             translations[int(string[0])] = translation
 
         return translations
