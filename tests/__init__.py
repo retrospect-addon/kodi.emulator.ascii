@@ -9,4 +9,4 @@ if sys.version_info[0] == 2:
     # noinspection PyUnresolvedReferences
     sys.setdefaultencoding("utf-8")
 
-__all__ = ["test_unicode", "test_xbmcvfs"]
+__all__ = ["test_kodistub", "test_unicode", "test_xbmc", "test_xbmc_player", "test_xbmcgui", "test_xbmcvfs"]
