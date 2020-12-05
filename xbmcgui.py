@@ -7,6 +7,16 @@ NOTIFICATION_INFO = "info"
 NOTIFICATION_WARNING = "warning"
 NOTIFICATION_ERROR = "error"
 
+INPUT_ALPHANUM = 0
+INPUT_NUMERIC = 1
+INPUT_DATE = 2
+INPUT_TIME = 3
+INPUT_IPADDRESS = 4
+INPUT_PASSWORD = 5
+
+PASSWORD_VERIFY = 1
+ALPHANUM_HIDE_INPUT = 2
+
 
 class Dialog(KodiStub):
     def __init__(self):
@@ -148,6 +158,23 @@ class Dialog(KodiStub):
 
     # noinspection PyUnusedLocal
     def notification(self, heading, message, icon=NOTIFICATION_INFO, time=5000, sound=True):
+        """ Show a Notification alert.
+
+        :param str heading:             Dialog heading.
+        :param str message:             Message to display.
+        :param str icon:                Icon to use. (default=xbmcgui.NOTIFICATION_INFO)
+        :param str time:                Time in milliseconds.
+        :param str sound:               Play notification sound. (default=True)
+
+        ============================  ============
+        Icon                          Description
+        ============================  ============
+        xbmcgui.NOTIFICATION_INFO     Info icon
+        xbmcgui.NOTIFICATION_WARNING  Warning icon
+        xbmcgui.NOTIFICATION_ERROR    Error icon
+        ============================  ============
+
+        """
         if icon == NOTIFICATION_WARNING:
             color = Colors.Yellow
         elif icon == NOTIFICATION_ERROR:
@@ -158,6 +185,87 @@ class Dialog(KodiStub):
         self.print_heading(heading, align_right=True, color=color)
         self.print_line(message, color=color)
         self.print_line("=" * 120, color)
+
+    # noinspection PyUnusedLocal
+    def input(self, heading, defaultt='', type=INPUT_ALPHANUM, option=0, autoclose=0):
+        """ Show an input dialog.
+
+        :param str heading:             Dialog heading.
+        :param str defaultt:            Default value
+        :param int type:                The type of keyboard dialog.
+        :param str option:              Option for the dialog.
+        :param int autoclose:           Milliseconds to autoclose dialog. (default=do not autoclose)
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        xbmcgui.INPUT_ALPHANUM    Standard keyboard
+        xbmcgui.INPUT_NUMERIC     Format: #
+        xbmcgui.INPUT_DATE        Format: DD/MM/YYYY
+        xbmcgui.INPUT_TIME        Format: HH:MM
+        xbmcgui.INPUT_IPADDRESS   Format: #.#.#.#
+        xbmcgui.INPUT_PASSWORD    Return MD5 hash of input, input is masked
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Option                       Description
+        ===========================  ============================================================================
+        xbmcgui.PASSWORD_VERIFY      Verifies an existing (default) md5 hashed password. Use with INPUT_PASSWORD.
+        xbmcgui.ALPHANUM_HIDE_INPUT  Masks input. Use with INPUT_ALPHANUM.
+        ===========================  ============================================================================
+
+        :return: Returns the entered data as a string. Returns an empty string if dialog was canceled.
+        :rtype: str
+
+        """
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return value if value is not None else defaultt
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
+            if not answer:
+                return defaultt
+        except EOFError:
+            return ''
+
+    # noinspection PyUnusedLocal
+    def numeric(self, type, heading, defaultt=None, bHiddenInput=None):
+        """ Show an numeric input dialog.
+
+        :param int type:                The type of numeric dialog.
+        :param str heading:             Dialog heading (will be ignored for type 4).
+        :param str defaultt:            Default value.
+        :param bool bHiddenInput:       Mask input (available for type 0).
+
+        =====  ========================  ========================================================
+        Param  Type                      Description
+        =====  ========================  ========================================================
+        0      ShowAndGetNumber          Default format: #
+        1      ShowAndGetDate            Default format: DD/MM/YYYY
+        2      ShowAndGetTime            Default format: HH:MM
+        3      ShowAndGetIPAddress       Default format: #.#.#.#
+        4      ShowAndVerifyNewPassword  Default format: *
+        =====  ========================  ========================================================
+
+        :return: Returns the entered data as a string. Returns the default value if dialog was canceled.
+        :rtype: str
+
+        """
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return value if value is not None else defaultt
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
+            if not answer:
+                return defaultt
+        except EOFError:
+            return ''
 
 
 # noinspection PyPep8Naming
