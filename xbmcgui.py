@@ -163,7 +163,7 @@ class Dialog(KodiStub):
         :param str heading:             Dialog heading.
         :param str message:             Message to display.
         :param str icon:                Icon to use. (default=xbmcgui.NOTIFICATION_INFO)
-        :param str time:                Time in milliseconds.
+        :param int time:                Time in milliseconds.
         :param str sound:               Play notification sound. (default=True)
 
         ============================  ============
