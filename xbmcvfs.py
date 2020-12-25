@@ -201,6 +201,24 @@ def copy(source, destination):
     return copyfile(source, destination) == destination
 
 
+# noinspection PyPep8Naming
+def rename(file, newFile):  # NOSONAR
+    """ file, newFile
+
+    :param str file:        File to rename
+    :param str newFile:     New filename, including the full path.
+
+    :return: True if successed
+    :rtype: bool
+
+    """
+    try:
+        os.rename(file, newFile)
+        return True
+    except:
+        return False
+
+
 def delete(file):
     """ Delete a file.
 
