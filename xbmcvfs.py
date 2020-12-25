@@ -44,7 +44,7 @@ class File(object):  # NOSONAR
         :param int numbytes:    How many bytes to read
 
         :return: The read bytes
-        :rtype: str
+        :rtype: bytes
         """
         return self._file.read(numbytes)
 
