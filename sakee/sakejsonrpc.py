@@ -47,6 +47,38 @@ class JsonRpcApi(object):
             result=result,
         )
 
+    class Addons(object):
+        """ List, enable and execute addons. """
+        __ADDONS = []
+
+        def __init__(self, addon_info):
+            """ Initialise the JSON RPC API Addons Namespace.
+
+            :param obj addon_info:   Information about the current Add-on paths.
+            """
+            self._ADDON_INFO = addon_info
+
+        # noinspection PyPep8Naming
+        def GetAddons(self, type=None, content=None, enabled=None, properties=None, limits=None, installed=True):  # NOSONAR
+            """ Gets all available addons. """
+            addons = []
+            for addon in os.listdir(os.path.join(self._ADDON_INFO.kodi_home_path, 'addons')):
+                addon_info = addoninfo.read_addon_xml(os.path.join(self._ADDON_INFO.kodi_home_path, 'addons', addon, 'addon.xml'))
+
+                if type and type == addon_info.get('type'):
+                    addons.append(dict(
+                        type=addon_info.get('type'),
+                        addonid=addon_info.get('id')))
+
+            return dict(
+                addons=addons,
+                limits=dict(
+                    start=0,
+                    end=len(addons),
+                    total=len(addons)
+                )
+            )
+
     class Settings(object):
         """ Allows manipulation of Kodi settings. """
         __SETTINGS = None

@@ -1,5 +1,7 @@
-import unittest
+import json
 import os
+import unittest
+
 import xbmc
 
 
@@ -28,3 +30,20 @@ class XbmcTest(unittest.TestCase):
         kb.doModal()
         self.assertTrue(kb.isConfirmed())
         self.assertEqual(text, kb.getText())
+
+    def test_executebuiltin(self):
+        # Fetch a list of installed addons
+        cmd = dict(
+            jsonrpc='2.0',
+            method='Addons.GetAddons',
+            params={'installed': True, 'enabled': True, 'type': 'xbmc.python.pluginsource'},
+            id=1
+        )
+        result = json.loads(xbmc.executeJSONRPC(json.dumps(cmd)))
+        self.assertEqual(result.get('jsonrpc'), '2.0')
+        self.assertIsInstance(result.get('result'), dict)
+        self.assertIsInstance(result.get('result').get('addons'), list)
+
+        # Loop over the installed add-ons and execute them
+        for addon in result.get('result').get('addons'):
+            xbmc.executebuiltin('RunPlugin(plugin://%s/?abc=123)' % addon.get('addonid'))
