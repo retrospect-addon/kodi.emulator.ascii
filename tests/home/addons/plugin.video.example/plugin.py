@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 
 try:  # Python 3
-    from urllib.parse import parse_qsl, urlparse
+    from urllib.parse import parse_qsl, urlparse, urlsplit, parse_qs
 except ImportError:  # Python 2
     from urlparse import parse_qsl, urlparse
 
@@ -17,8 +17,10 @@ if __name__ == "__main__":
         exit(1)
 
     # Parse routing
-    url_parts = urlparse(sys.argv[1])
-    route = url_parts.path or '/'
-    query = dict(parse_qsl(url_parts.query))
+    path = urlsplit(sys.argv[0]).path or '/'
+    if len(sys.argv) > 2:
+        params = parse_qs(sys.argv[2].lstrip('?'))
+    else:
+        params = {}
 
-    print('Invoked plugin.video.example with route %s and query %s' % (route, query))
+    print('Invoked plugin.video.example with route %s and query %s' % (path, params))

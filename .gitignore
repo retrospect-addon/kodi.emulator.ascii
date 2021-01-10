@@ -1,4 +1,6 @@
 .idea/
+.env
+Pipfile*
 
 build/*
 dist/*

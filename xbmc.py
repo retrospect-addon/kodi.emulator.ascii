@@ -745,22 +745,16 @@ def executebuiltin(function):
     See: http://kodi.wiki/view/List_of_Built_In_Functions
 
     """
-    import re
-    import subprocess
-
-    KodiStub.print_line("Executebuiltin: {0}".format(function), color=Colors.Blue)
+    from sakee.sakebuiltin import BuiltinApi
 
     try:
-        command, params = re.search(r'([A-Za-z]+)\(([^\)]+)\)', function).groups()
-    except AttributeError:
-        raise ValueError('Could not process %s', function)
+        # Implement some methods for real
+        BuiltinApi().handle(function)
 
-    if command.lower() in ['runplugin', 'playmedia']:
-        addon, route = re.search(r'plugin://([^/]+)(.*)', params).groups()
-        addon_info = addoninfo.read_addon_xml(os.path.join(__add_on_info.kodi_home_path, 'addons', addon, 'addon.xml'))
-        pluginsource = addon_info.get('pluginsource')
-
-        subprocess.Popen(['python', os.path.join(__add_on_info.kodi_home_path, 'addons', addon, pluginsource), route])
+    except NotImplementedError:
+        # Fallback to stubs
+        KodiStub.print_line("Executebuiltin: {0} is not implemented".format(function), color=Colors.Red)
+        pass
 
 
 # noinspection PyPep8Naming

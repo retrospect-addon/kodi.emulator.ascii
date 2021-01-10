@@ -31,8 +31,8 @@ class XbmcTest(unittest.TestCase):
         self.assertTrue(kb.isConfirmed())
         self.assertEqual(text, kb.getText())
 
-    def test_executebuiltin(self):
-        # Fetch a list of installed addons
+    def test_jsonrpc(self):
+        # Addons.GetAddons
         cmd = dict(
             jsonrpc='2.0',
             method='Addons.GetAddons',
@@ -43,7 +43,13 @@ class XbmcTest(unittest.TestCase):
         self.assertEqual(result.get('jsonrpc'), '2.0')
         self.assertIsInstance(result.get('result'), dict)
         self.assertIsInstance(result.get('result').get('addons'), list)
+        self.assertEqual(result.get('result').get('addons')[0].get('addonid'), 'plugin.video.example')
 
-        # Loop over the installed add-ons and execute them
-        for addon in result.get('result').get('addons'):
-            xbmc.executebuiltin('RunPlugin(plugin://%s/?abc=123)' % addon.get('addonid'))
+    def test_executebuiltin(self):
+        # RunPlugin
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.example)')
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.example/)')
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.example/path/to)')
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.example/?abc=123)')
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.example/path/to?abc=123)')
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.example/path/to/?abc=123)')
