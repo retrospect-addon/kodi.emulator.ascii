@@ -12,7 +12,7 @@ on:
 jobs:
   check-addon:
     name: Run unit tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
@@ -38,7 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run unit tests
-        run: |
-          export KODI_HOME=$GITHUB_WORKSPACE/tests/home
-          export KODI_INTERACTIVE=0
-          pytest -v --color=yes
+        env:
+          KODI_HOME: ${{ github.workspace }}/tests/home
+          KODI_INTERACTIVE: 0
+        run: pytest -v --color=yes
