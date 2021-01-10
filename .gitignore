@@ -10,3 +10,4 @@ jsonrcpcommands/*.json
 *.pyc
 
 tests/data/test.txt
+tests/home/userdata/

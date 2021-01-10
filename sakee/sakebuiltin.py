@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0
-
 import os
 import re
 import subprocess
+import threading
 
 from sakee import addoninfo
 
@@ -52,6 +52,24 @@ class BuiltinApi(object):
         addon_route = 'plugin://' + addon + path
         addon_params = params or ''
 
-        # TODO: find a better way to launch this
         # This causes argv[0] to be addon_entry, while it's skipped in a real Kodi.
-        subprocess.Popen(['python', addon_entry, addon_route, '-1', addon_params, 'resume:false'])
+        # subprocess.Popen(['python', addon_entry, addon_route, '-1', addon_params, 'resume:false'])
+
+        def execute_addon(filepath, params):
+            """ Execute the add-on. """
+            # We need to be able to set the sys.argv ourself.
+            code = ("import sys\n"
+                    "import os\n"
+                    "os.chdir(os.path.dirname('{filename}'))\n"
+                    "sys.argv = {params}\n"
+                    "with open('{filename}', 'rb') as fdesc:\n"
+                    "    exec(compile(fdesc.read(), '{filename}', 'exec'))").format(filename=filepath, params=params)
+
+            p = subprocess.Popen(['python'], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
+            output = p.communicate(input=code.encode())[0]
+
+            print(output.decode())
+
+        # Execute addon_entry in the background.
+        background = threading.Thread(target=execute_addon, args=(addon_entry, [addon_route, '-1', addon_params, 'resume:false']))
+        background.start()

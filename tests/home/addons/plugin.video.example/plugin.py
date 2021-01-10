@@ -3,12 +3,13 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 import sys
 
 try:  # Python 3
     from urllib.parse import parse_qsl, urlparse, urlsplit, parse_qs
 except ImportError:  # Python 2
-    from urlparse import parse_qsl, urlparse
+    from urlparse import parse_qsl, urlparse, urlsplit, parse_qs
 
 if __name__ == "__main__":
 
@@ -23,4 +24,12 @@ if __name__ == "__main__":
     else:
         params = {}
 
-    print('Invoked plugin.video.example with route %s and query %s' % (path, params))
+    message = 'Invoked plugin.video.example with route %s and query %s' % (path, params)
+    print(message)
+
+    filepath = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'userdata', 'plugin.video.example'))
+
+    if not os.path.exists(filepath):
+        os.makedirs(filepath)
+    with open(os.path.join(filepath, 'executed.txt'), 'w') as fdesc:
+        fdesc.write(message)
