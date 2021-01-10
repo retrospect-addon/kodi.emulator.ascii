@@ -63,12 +63,14 @@ class JsonRpcApi(object):
             """ Gets all available addons. """
             addons = []
             for addon in os.listdir(os.path.join(self._ADDON_INFO.kodi_home_path, 'addons')):
-                addon_info = addoninfo.read_addon_xml(os.path.join(self._ADDON_INFO.kodi_home_path, 'addons', addon, 'addon.xml'))
+                addon_xml = os.path.join(self._ADDON_INFO.kodi_home_path, 'addons', addon, 'addon.xml')
+                if not os.path.exists(addon_xml):
+                    continue
 
-                if type and type == addon_info.get('type'):
-                    addons.append(dict(
-                        type=addon_info.get('type'),
-                        addonid=addon_info.get('id')))
+                addon_info = addoninfo.read_addon_xml(addon_xml)
+                addons.append(dict(
+                    type=addon_info.get('type'),
+                    addonid=addon_info.get('id')))
 
             return dict(
                 addons=addons,

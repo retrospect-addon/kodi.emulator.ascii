@@ -17,6 +17,9 @@ if __name__ == "__main__":
         print('ERROR: Missing URL as first parameter')
         exit(1)
 
+    # Remove the first argument
+    sys.argv.pop(0)
+
     # Parse routing
     path = urlsplit(sys.argv[0]).path or '/'
     if len(sys.argv) > 2:
