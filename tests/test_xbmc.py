@@ -1,6 +1,5 @@
 import json
 import os
-import time
 import unittest
 
 import xbmc
@@ -45,30 +44,3 @@ class XbmcTest(unittest.TestCase):
         self.assertIsInstance(result.get('result'), dict)
         self.assertIsInstance(result.get('result').get('addons'), list)
         self.assertEqual(result.get('result').get('addons')[0].get('addonid'), 'plugin.video.example')
-
-    def test_executebuiltin(self):
-
-        def _wait_for_file(filename, timeout=10):
-            """Wait until a file appears on the filesystem."""
-            deadline = time.time() + timeout
-            while time.time() < deadline:
-                if os.path.exists(filename):
-                    return True
-                time.sleep(.1)
-            return False
-
-        filename = 'tests/home/userdata/plugin.video.example/executed.txt'
-        if os.path.exists(filename):
-            os.remove(filename)
-
-        tests = [
-            'RunPlugin(plugin://plugin.video.example/path/to/method/?port=1234)'
-            'RunPlugin(plugin://plugin.video.example/path/to/method/)'
-            'RunPlugin(plugin://plugin.video.example/)'
-            'RunPlugin(plugin://plugin.video.example)'
-        ]
-
-        for test in tests:
-            xbmc.executebuiltin(test)
-            success = _wait_for_file(filename)
-            self.assertTrue(success)

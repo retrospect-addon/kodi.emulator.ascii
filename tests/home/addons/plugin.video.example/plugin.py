@@ -5,11 +5,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import sys
+import tempfile
+
+import xbmc
+import xbmcplugin
 
 try:  # Python 3
-    from urllib.parse import parse_qsl, urlparse, urlsplit, parse_qs
+    from urllib.parse import urlparse, parse_qsl
 except ImportError:  # Python 2
-    from urlparse import parse_qsl, urlparse, urlsplit, parse_qs
+    from urlparse import urlparse, parse_qsl
 
 if __name__ == "__main__":
 
@@ -17,22 +21,26 @@ if __name__ == "__main__":
         print('ERROR: Missing URL as first parameter')
         exit(1)
 
-    # Remove the first argument
-    sys.argv.pop(0)
-
     # Parse routing
-    path = urlsplit(sys.argv[0]).path or '/'
+    url_parts = urlparse(sys.argv[0])
+    route = url_parts.path
     if len(sys.argv) > 2:
-        params = parse_qs(sys.argv[2].lstrip('?'))
+        query = dict(parse_qsl(sys.argv[2].lstrip('?')))
     else:
-        params = {}
+        query = {}
+    print('Invoked plugin.video.example with route %s and query %s' % (route, query))
 
-    message = 'Invoked plugin.video.example with route %s and query %s' % (path, params)
-    print(message)
+    # Execute add-on functions
+    if route == '/touch':
+        file = os.path.join(tempfile.gettempdir(), query.get('filename'))
+        open(file, 'w').close()
+        exit()
 
-    filepath = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'userdata', 'plugin.video.example'))
+    if route == '/play':
+        listitem = xbmc.ListItem(label='Something', path=query.get('filename'))
+        xbmcplugin.setResolvedUrl(-1, True, listitem)
+        exit()
 
-    if not os.path.exists(filepath):
-        os.makedirs(filepath)
-    with open(os.path.join(filepath, 'executed.txt'), 'w') as fdesc:
-        fdesc.write(message)
+    # Unknown route
+    print('Unknown route %s' % route)
+    exit(1)
