@@ -1,9 +1,11 @@
+# SPDX-License-Identifier: GPL-3.0
+
 import os
+import xml.etree.ElementTree as ET
 from collections import namedtuple
 
 from sakee.colors import Colors
 from sakee.stub import KodiStub
-
 
 # Custom AddonData type
 AddonData = namedtuple('AddonData', [
@@ -98,3 +100,39 @@ def get_add_on_info_from_calling_script(add_on_id=None, print_info=False):
         color=Colors.Blue
     )
     return a
+
+
+def read_addon_xml(path):
+    """Parse the addon.xml and return an info dictionary"""
+    info = dict(
+        path='./',
+        profile='special://userdata',
+        type='xbmc.python.pluginsource',
+    )
+
+    tree = ET.parse(path)
+    root = tree.getroot()
+
+    info.update(root.attrib)  # Add 'id', 'name' and 'version'
+    info['author'] = info.pop('provider-name')
+
+    for child in root:
+        if child.attrib.get('point') == 'xbmc.python.pluginsource':
+            info['pluginsource'] = child.attrib.get('library')
+            continue
+
+        if child.attrib.get('point') == 'xbmc.addon.metadata':
+            for grandchild in child:
+                # Handle assets differently
+                if grandchild.tag == 'assets':
+                    for asset in grandchild:
+                        info[asset.tag] = asset.text
+                    continue
+                # Not in English ?  Drop it
+                if grandchild.attrib.get('lang', 'en_GB') != 'en_GB':
+                    continue
+                # Add metadata
+                info[grandchild.tag] = grandchild.text
+            continue
+
+    return info

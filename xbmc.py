@@ -690,26 +690,25 @@ def executeJSONRPC(jsonrpccommand):  # NOSONAR
         pass
 
     json_responses = os.environ.get("KODI_STUB_RPC_RESPONSES")
-    if not json_responses:
-        raise ValueError(
-            "Could not find JSON Response folder. Use the environment variable KODI_STUB_RPC_RESPONSES to set one")
+    if json_responses:
+        path = "{}.json".format(os.path.join(json_responses, json_data["method"].lower()))
+        if os.path.isfile(path):
+            with io.open(path, mode='r', encoding='utf-8') as fd:
+                stub_content = json.loads(fd.read())
+                if isinstance(stub_content, dict):
+                    return json.dumps(stub_content)
+                try:
+                    return json.dumps(next(stub.get('response')
+                                           for stub in stub_content
+                                           if json_data.get('params')
+                                           and stub.get('request', {}).get('method') == json_data.get('method')
+                                           and stub.get('request', {}).get('params') == json_data.get('params')))
+                except StopIteration:
+                    pass
+    else:
+        KodiStub.print_line("Warning: Could not find JSON Response folder. Use the environment variable KODI_STUB_RPC_RESPONSES to set one.", color=Colors.Red)
 
-    path = "{}.json".format(os.path.join(json_responses, json_data["method"].lower()))
-    if os.path.isfile(path):
-        with io.open(path, mode='r', encoding='utf-8') as fd:
-            stub_content = json.loads(fd.read())
-            if isinstance(stub_content, dict):
-                return json.dumps(stub_content)
-            try:
-                return json.dumps(next(stub.get('response')
-                                       for stub in stub_content
-                                       if json_data.get('params')
-                                       and stub.get('request', {}).get('method') == json_data.get('method')
-                                       and stub.get('request', {}).get('params') == json_data.get('params')))
-            except StopIteration:
-                pass
-
-    return '{"id":1,"jsonrpc":"2.0","result":"OK"}'
+    return json.dumps(dict(id=1, jsonrpc="2.0", result="OK"))
 
 
 # noinspection PyPep8Naming
@@ -746,8 +745,16 @@ def executebuiltin(function):
     See: http://kodi.wiki/view/List_of_Built_In_Functions
 
     """
+    from sakee.sakebuiltin import BuiltinApi
 
-    KodiStub.print_line("Executebuiltin: {0}".format(function), color=Colors.Blue)
+    try:
+        # Implement some methods for real
+        BuiltinApi().handle(function)
+
+    except NotImplementedError:
+        # Fallback to stubs
+        KodiStub.print_line("Executebuiltin: {0} is not implemented".format(function), color=Colors.Red)
+        pass
 
 
 # noinspection PyPep8Naming

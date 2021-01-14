@@ -1,5 +1,7 @@
-import unittest
+import json
 import os
+import unittest
+
 import xbmc
 
 
@@ -28,3 +30,17 @@ class XbmcTest(unittest.TestCase):
         kb.doModal()
         self.assertTrue(kb.isConfirmed())
         self.assertEqual(text, kb.getText())
+
+    def test_jsonrpc(self):
+        # Addons.GetAddons
+        cmd = dict(
+            jsonrpc='2.0',
+            method='Addons.GetAddons',
+            params={'installed': True, 'enabled': True, 'type': 'xbmc.python.pluginsource'},
+            id=1
+        )
+        result = json.loads(xbmc.executeJSONRPC(json.dumps(cmd)))
+        self.assertEqual(result.get('jsonrpc'), '2.0')
+        self.assertIsInstance(result.get('result'), dict)
+        self.assertIsInstance(result.get('result').get('addons'), list)
+        self.assertEqual(result.get('result').get('addons')[0].get('addonid'), 'plugin.video.example')
