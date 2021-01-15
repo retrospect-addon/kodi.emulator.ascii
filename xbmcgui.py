@@ -76,7 +76,7 @@ class Dialog(KodiStub):
         """ Show a multi-select dialog.
 
         :param str heading:                     Dialog heading.
-        :param list[string|ListItem] options:   Otions to choose from.
+        :param list[string|ListItem] options:   Options to choose from.
         :param int autoclose:                   Milliseconds to autoclose dialog. (default=do not autoclose)
         :param list[int]|None preselect:        Indexes of items to preselect in list (default: do not preselect any item)
         :param bool useDetails:                 Use detailed list instead of a compact list. (default=false)
@@ -104,7 +104,7 @@ class Dialog(KodiStub):
         """ Show a select dialog.
 
         :param str heading:                     Dialog heading.
-        :param list[string|ListItem] options:   Otions to choose from.
+        :param list[string|ListItem] options:   Options to choose from.
         :param int autoclose:                   Milliseconds to autoclose dialog. (default=do not autoclose)
         :param int|None preselect:              Indexes of items to preselect in list (default: do not preselect any item)
         :param bool useDetails:                 Use detailed list instead of a compact list. (default=false)
@@ -226,8 +226,7 @@ class Dialog(KodiStub):
         KodiStub.print_heading(heading)
         try:
             answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
-            if not answer:
-                return defaultt
+            return answer if answer != '' else defaultt
         except EOFError:
             return ''
 
@@ -262,8 +261,169 @@ class Dialog(KodiStub):
         KodiStub.print_heading(heading)
         try:
             answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
-            if not answer:
-                return defaultt
+            return answer if answer != '' else defaultt
+        except EOFError:
+            return ''
+
+    # noinspection PyUnusedLocal
+    def browse(self, type, heading, shares, mask='', useThumbs=False, treatAsFolder=False, defaultt='', enableMultiple=False):
+        """ Browser dialog.
+
+        The function offer the possibility to select a file by the user of the add-on.
+        It allows all the options that are possible in Kodi itself and offers all support file types.
+
+        :param int type:                The type of browse dialog.
+        :param str heading:             Dialog heading.
+        :param str shares:              From sources.xml
+        :param str mask:                '|' separated file mask. (i.e. '.jpg|.png')
+        :param bool useThumbs:          Auto switch to Thumb view if files exist.
+        :param bool treatAsFolder:      Playlists and archives act as folders.
+        :param str defaultt:            Default path or file.
+        :param bool enableMultiple:     Multiple file selection is enabled.
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        0                         ShowAndGetDirectory
+        1                         ShowAndGetFile
+        2                         ShowAndGetImage
+        3                         ShowAndGetWriteableDirectory
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Shares                       Description
+        ===========================  ============================================================================
+        "programs"                   list program addons
+        "video"                      list video sources
+        "music"                      list music sources
+        "pictures"                   list picture sources
+        "files"                      list file sources (added through filemanager)
+        "games"                      list game sources
+        "local"                      list local drives
+        ""                           list local drives and network shares
+        ===========================  ============================================================================
+
+        :return: If enableMultiple is False (default): returns filename and/or path as a string to the location of the highlighted item, if user pressed 'Ok' or
+                 a masked item was selected. Returns the default value if dialog was canceled.
+                 If enableMultiple is True: returns tuple of marked filenames as a string if user pressed 'Ok' or a masked item was selected. Returns empty
+                 tuple if dialog was canceled.
+                 If type is 0 or 3 the enableMultiple parameter is ignored.
+
+        :rtype: str|tuple[str]
+
+        """
+        if enableMultiple:
+            return self.browseMultiple(type, heading, shares, mask, useThumbs, treatAsFolder, defaultt)
+        else:
+            return self.browseSingle(type, heading, shares, mask, useThumbs, treatAsFolder, defaultt)
+
+    # noinspection PyUnusedLocal
+    def browseMultiple(self, type, heading, shares, mask='', useThumbs=False, treatAsFolder=False, defaultt=''):
+        """ Browser dialog.
+
+        The function offer the possibility to select a file by the user of the add-on.
+        It allows all the options that are possible in Kodi itself and offers all support file types.
+
+        :param int type:                The type of browse dialog.
+        :param str heading:             Dialog heading.
+        :param str shares:              From sources.xml
+        :param str mask:                '|' separated file mask. (i.e. '.jpg|.png')
+        :param bool useThumbs:          Auto switch to Thumb view if files exist.
+        :param bool treatAsFolder:      Playlists and archives act as folders.
+        :param str defaultt:            Default path or file.
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        0                         ShowAndGetDirectory
+        1                         ShowAndGetFile
+        2                         ShowAndGetImage
+        3                         ShowAndGetWriteableDirectory
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Shares                       Description
+        ===========================  ============================================================================
+        "programs"                   list program addons
+        "video"                      list video sources
+        "music"                      list music sources
+        "pictures"                   list picture sources
+        "files"                      list file sources (added through filemanager)
+        "games"                      list game sources
+        "local"                      list local drives
+        ""                           list local drives and network shares
+        ===========================  ============================================================================
+
+        :return: Returns tuple of marked filenames as a string if user pressed 'Ok' or a masked item was selected.
+                 Returns empty tuple if dialog was canceled.
+
+        :rtype: tuple[str]
+
+        """
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return (value,) if value is not None else (defaultt,)
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please enter the path to a file [{}]?".format(defaultt), color=Colors.Yellow)
+            return (answer,) if answer != '' else (defaultt,)
+        except EOFError:
+            return ()
+
+    # noinspection PyUnusedLocal
+    def browseSingle(self, type, heading, shares, mask='', useThumbs=False, treatAsFolder=False, defaultt=''):
+        """ Browser dialog.
+
+        The function offer the possibility to select a file by the user of the add-on.
+        It allows all the options that are possible in Kodi itself and offers all support file types.
+
+        :param int type:                The type of browse dialog.
+        :param str heading:             Dialog heading.
+        :param str shares:              From sources.xml
+        :param str mask:                '|' separated file mask. (i.e. '.jpg|.png')
+        :param bool useThumbs:          Auto switch to Thumb view if files exist.
+        :param bool treatAsFolder:      Playlists and archives act as folders.
+        :param str defaultt:            Default path or file.
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        0                         ShowAndGetDirectory
+        1                         ShowAndGetFile
+        2                         ShowAndGetImage
+        3                         ShowAndGetWriteableDirectory
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Shares                       Description
+        ===========================  ============================================================================
+        "programs"                   list program addons
+        "video"                      list video sources
+        "music"                      list music sources
+        "pictures"                   list picture sources
+        "files"                      list file sources (added through filemanager)
+        "games"                      list game sources
+        "local"                      list local drives
+        ""                           list local drives and network shares
+        ===========================  ============================================================================
+
+        :return: Returns filename and/or path as a string to the location of the highlighted item, if user pressed 'Ok' or a masked item was selected.
+                 Returns the default value if dialog was canceled.
+
+        :rtype: str
+
+        """
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return value if value is not None else defaultt
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please enter the path to a file [{}]?".format(defaultt), color=Colors.Yellow)
+            return answer if answer != '' else defaultt
         except EOFError:
             return ''
 

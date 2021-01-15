@@ -37,3 +37,35 @@ class XbmcGuiTest(unittest.TestCase):
         dlg = xbmcgui.Dialog()
         value = dlg.numeric(0, 'Heading', defaultt=text)
         self.assertEqual(text, value)
+
+    def test_dialog_browse_single(self):
+        default_filename = '/tmp/default'
+
+        dlg = xbmcgui.Dialog()
+        value = dlg.browseSingle(0, 'Heading', shares='local', defaultt=default_filename)
+        self.assertEqual(default_filename, value)
+
+        entered_filename = '/tmp/entered'
+        kb = xbmc.Keyboard()
+        stub = kb.get_keyboard_stub()
+        stub.add_input(entered_filename)
+
+        dlg = xbmcgui.Dialog()
+        value = dlg.browseSingle(0, 'Heading', shares='local', defaultt=default_filename)
+        self.assertEqual(entered_filename, value)
+
+    def test_dialog_browse_multiple(self):
+        default_filename = '/tmp/default'
+
+        dlg = xbmcgui.Dialog()
+        value = dlg.browseMultiple(0, 'Heading', shares='local', defaultt=default_filename)
+        self.assertEqual((default_filename,), value)
+
+        entered_filename = '/tmp/entered'
+        kb = xbmc.Keyboard()
+        stub = kb.get_keyboard_stub()
+        stub.add_input(entered_filename)
+
+        dlg = xbmcgui.Dialog()
+        value = dlg.browseMultiple(0, 'Heading', shares='local', defaultt=default_filename)
+        self.assertEqual((entered_filename,), value)
