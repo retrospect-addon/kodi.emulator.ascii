@@ -754,7 +754,6 @@ def executebuiltin(function):
     except NotImplementedError:
         # Fallback to stubs
         KodiStub.print_line("Executebuiltin: {0} is not implemented".format(function), color=Colors.Red)
-        pass
 
 
 # noinspection PyPep8Naming
@@ -842,6 +841,20 @@ def getLanguage(format=ENGLISH_NAME, region=False):  # NOSONAR
         return "eng" if not region else "eng-gbr"
 
     return "English"
+
+
+# noinspection PyShadowingBuiltins,PyPep8Naming
+def getLocalizedString(id):  # NOSONAR
+    """ Get a localized `unicode string`.
+
+    :param int id:  id# for string you want to localize.
+
+    :return: Localized `unicode string`
+    :rtype: str
+
+    """
+
+    return "xbmc:po:{}".format(id)
 
 
 def log(msg, level=0):
