@@ -636,6 +636,8 @@ class DialogProgress(KodiStub):
     def __init__(self):
         """ Kodi's progress dialog class (Duh!) """
 
+        self.__message = None
+
         super(DialogProgress, self).__init__()
 
     def create(self, heading, message=""):
@@ -652,6 +654,7 @@ class DialogProgress(KodiStub):
 
         """
 
+        self.__message = message
         self.print_heading(heading)
         self.print_line(message)
 
@@ -663,7 +666,9 @@ class DialogProgress(KodiStub):
 
         """
 
-        self.print_line("{}{}%{}: {}".format(Colors.Yellow, percent, Colors.EndColor, message))
+        self.print_line(
+            "{}{}%{}: {}".format(
+                Colors.Yellow, percent, Colors.EndColor, message or self.__message))
 
     def close(self):
         """ Close the progress dialog. """
@@ -677,6 +682,7 @@ class DialogProgress(KodiStub):
 # noinspection PyArgumentList
 class DialogProgressBG(KodiStub):
     def __init__(self):
+        self.__message = None
         super(DialogProgressBG, self).__init__()
 
     def create(self, heading, message=""):
@@ -693,6 +699,7 @@ class DialogProgressBG(KodiStub):
 
         """
 
+        self.__message = message
         self.print_heading(heading, align_right=True)
         self.print_line(message)
 
@@ -706,9 +713,13 @@ class DialogProgressBG(KodiStub):
         """
 
         if heading:
-            self.print_line("{}{}%: {}{} - {}".format(Colors.Yellow, percent, heading, Colors.EndColor, message))
+            self.print_line(
+                "{}{}%: {}{} - {}".format(
+                    Colors.Yellow, percent, heading, Colors.EndColor, message or self.__message))
         else:
-            self.print_line("{}{}%{}: {}".format(Colors.Yellow, percent, Colors.EndColor, message))
+            self.print_line(
+                "{}{}%{}: {}".format(
+                    Colors.Yellow, percent, Colors.EndColor, message or self.__message))
 
     def close(self):
         """ Close the progress dialog. """
