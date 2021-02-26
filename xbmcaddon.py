@@ -312,7 +312,7 @@ class Addon(KodiStub):
             setting_regex = r'id="([^"]+)"[^>]*value="([^"]*)"'
             results = re.findall(setting_regex, user_xml)
             if not results:
-                results = re.findall(r'id="([^"]+)"[^>]*>([^<]+)<', user_xml)
+                results = re.findall(r'id="([^"/]+)"[^/>]*>([^</]+)<', user_xml)
 
             for result in results:
                 # if result[0] in settings:  -> We need to keep all settings in the settings.xml
