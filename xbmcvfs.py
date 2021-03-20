@@ -356,9 +356,6 @@ def translatePath(path):  # NOSONAR
             raise ValueError("Missing __kodi_{}_path data".format(name))
         new_path = os.path.join(base_path, *[i.replace("/", os.sep) for i in segments if i and i != ''])
 
-        if not os.path.exists(new_path):
-            raise ValueError("Invalid path specified: {}".format(path, ))
-
         return new_path
 
     if path.startswith("special://profile/"):
