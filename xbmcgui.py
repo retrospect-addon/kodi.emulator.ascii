@@ -498,6 +498,16 @@ class ListItem(KodiStub):
         self.__info.update(infoLabels)
         self.print_line("Updating infolabels with {}".format(infoLabels), verbose=True)
 
+    def setContentLookup(self, enable):
+        """ Enable or disable content lookup for item.
+
+        :param bool enable: bool to enable content lookup
+
+        If disabled, HEAD requests to e.g determine mime type will not be sent.
+
+        """
+        pass
+
     def setArt(self, values):  # NOSONAR
         """ Sets the listitem's art
 
