@@ -768,7 +768,29 @@ def getCondVisibility(condition):  # NOSONAR
     List of Conditions - http://kodi.wiki/view/List_of_Boolean_Conditions
 
     """
+
+    if "+" in condition:
+        final_result = 1
+        conditions = condition.split("+", 1)
+        for c in conditions:
+            sub_result = __get_cond_visibility(c)
+            final_result = final_result and sub_result
+
+    elif "|" in condition:
+        final_result = 0
+        conditions = condition.split("|", 1)
+        for c in conditions:
+            sub_result = __get_cond_visibility(c)
+            final_result = final_result or sub_result
+    else:
+        final_result = __get_cond_visibility(condition)
+
+    return final_result
+
+
+def __get_cond_visibility(condition):
     result = False
+    condition = condition.strip()
     if condition.startswith('System.HasAddon('):
         add_on_id = condition.replace('System.HasAddon(', '').replace(')', '').strip('"')
         add_ons = os.listdir(os.path.join(__add_on_info.kodi_home_path, "addons"))
@@ -778,6 +800,9 @@ def getCondVisibility(condition):  # NOSONAR
             add_ons += os.listdir(parent_path)
 
         result = add_on_id in add_ons
+
+    elif condition.startswith('System.AddonIsEnabled('):
+        result = True
 
     elif condition == 'system.platform.windows':
         result = os.name == "nt"
