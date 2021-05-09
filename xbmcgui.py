@@ -619,6 +619,16 @@ class ListItem(KodiStub):
 
         return self.__path or self.getProperty("path") or ""
 
+    def setPath(self, path):  # NOSONAR
+        """ Sets the listitem's path.
+
+        :param str path:    Activated when item is clicked.
+
+        """
+
+        self.__path = path
+        self.setProperty("path", path)
+
     def __str__(self):
         if KodiStub.is_verbose:
             value = "%s [%s]\n" % (self.__label, self.__type or "")

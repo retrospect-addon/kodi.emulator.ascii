@@ -69,3 +69,9 @@ class XbmcGuiTest(unittest.TestCase):
         dlg = xbmcgui.Dialog()
         value = dlg.browseMultiple(0, 'Heading', shares='local', defaultt=default_filename)
         self.assertEqual((entered_filename,), value)
+
+    def test_list_item_path(self):
+        path = "https://test/path"
+        item = xbmcgui.ListItem(path=path)
+        self.assertEqual(path, item.getPath())
+        self.assertEqual(path, item.getProperty("path"))
