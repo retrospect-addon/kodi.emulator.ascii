@@ -113,6 +113,8 @@ class JsonRpcApi(object):
             value = JsonRpcApi.Settings.__SETTINGS.get(setting, '')
             if value == 'true':
                 value = True
+            elif value == 'false':
+                value = False
 
             return dict(
                 value=value
