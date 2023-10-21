@@ -835,6 +835,14 @@ def getInfoLabel(infoTag):  # NOSONAR
     if infoTag.lower() == "system.buildversion":
         return "19.0 Git:20200626-xxxxxxxxxx"
 
+    if infoTag.lower() == "network.ipaddress":
+        import socket
+        ## getting the hostname by socket.gethostname() method
+        hostname = socket.gethostname()
+        ## getting the IP address using socket.gethostbyname() method
+        ip_address = socket.gethostbyname(hostname)
+        return ip_address
+
     return "InfoLabel:{}".format(infoTag)
 
 
