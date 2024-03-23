@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0
-
 import os
 import io
 import re
+from typing import Optional
 
 from sakee import addoninfo
 from sakee.stub import KodiStub
@@ -36,120 +36,211 @@ class Addon(KodiStub):
         self.__localization = self.__get_strings()
         self.__settings = self.__get_settings()
 
-    def getSetting(self, id):  # NOSONAR
+    def getSetting(self, id: str) -> Optional[str]:
         """ Returns the value of a setting as a unicode string.
 
-        :param str id:  Id of the setting that the module needs to access.
+        :param id: ID of the setting that the module needs to access.
 
-        :return: The value of a setting as a unicode string.
-        :rtype: str
+        :return: The value of a setting as a unicode string. If the value was not set, None
+        is returned.
 
         """
+
         if id in self.__settings:
             return self.__settings[id]
         else:
-            return ''
+            return ""
 
-    def getSettingBool(self, id):
+    def getSettingBool(self, id: str) -> bool:
         """ Returns the value of a setting as a boolean.
 
-        :param str id:  Id of the setting that the module needs to access.
+        :param id: ID of the setting that the module needs to access.
 
         :return: The value of a setting as a boolean.
-        :rtype: bool
 
         """
+
+        return self.getBool(id)
+
+    def getBool(self, id: str) -> bool:
+        """ Returns the value of a setting as a boolean.
+
+        :param id: ID of the setting that the module needs to access.
+
+        :return: The value of a setting as a boolean.
+
+        """
+
         return self.getSetting(id).lower() == "true"
 
-    def getSettingInt(self, id):
+    def getSettingInt(self, id: str) -> int:
         """ Returns the value of a setting as an integer.
 
-        :param str id:  Id of the setting that the module needs to access.
+        :param str id: ID of the setting that the module needs to access.
 
         :return: The value of a setting as an integer.
         :rtype: int
 
         """
 
+        return self.getInt(id)
+
+    def getInt(self, id: str) -> int:
+        """ Returns the value of a setting as an integer.
+
+        :param id: ID of the setting that the module needs to access.
+
+        :return: The value of a setting as an integer.
+
+        """
+
         return int(self.getSetting(id) or 0)
 
-    def getSettingNumber(self, id):
+    def getSettingNumber(self, id: str) -> float:
         """ Returns the value of a setting as a floating point number.
 
-        :param str id:  Id of the setting that the module needs to access.
+        :param id: ID of the setting that the module needs to access.
 
         :return: The value of a setting as a floating point number.
-        :rtype: float
+
+        """
+
+        return self.getNumber(id)
+
+    def getNumber(self, id: str) -> float:
+        """ Returns the value of a setting as a floating point number.
+
+        :param id: ID of the setting that the module needs to access.
+
+        :return: The value of a setting as a floating point number.
 
         """
 
         return float(self.getSetting(id) or 0.0)
 
-    def getSettingString(self, id):
+    def getSettingString(self, id: str) -> str:
         """ Returns the value of a setting as a string.
 
-        :param str id:  Id of the setting that the module needs to access.
+        :param id: ID of the setting that the module needs to access.
 
         :return: The value of a setting as a string.
-        :rtype: float
+
+        """
+
+        return self.getString(id)
+
+    def getString(self, id: str) -> str:
+        """ Returns the value of a setting as a string.
+
+        :param id: ID of the setting that the module needs to access.
+
+        :return: The value of a setting as a string.
 
         """
 
         return str(self.getSetting(id) or "")
 
-    def setSetting(self, id, value):  # NOSONAR
+    def setSetting(self, id: str, value: str) -> None:
         """ Sets a script setting.
 
-        :param str id:       Id of the setting that the module needs to access.
-        :param str value:    Value of the setting.
+        :param id:       ID of the setting that the module needs to access.
+        :param value:    Value of the setting.
 
         """
 
         self.__settings[id] = value
 
-    def setSettingBool(self, id, value):  # NOSONAR
+    def setSettingBool(self, id: str, value: bool) -> bool:
         """ Sets a script setting.
 
-        :param str id:       Id of the setting that the module needs to access.
-        :param bool value:    Value of the setting.
+        :param id:       ID of the setting that the module needs to access.
+        :param value:    Value of the setting.
+
+        :return: True if the value of the setting was set, false otherwise
+
+        """
+
+        self.setBool(id, value)
+        return True
+
+    def setBool(self, id: str, value: bool) -> None:
+        """ Sets a script setting.
+
+        :param id:       ID of the setting that the module needs to access.
+        :param value:    Value of the setting.
 
         """
 
         self.__settings[id] = "true" if value else "false"
-        return True
 
-    def setSettingInt(self, id, value):  # NOSONAR
+    def setSettingInt(self, id: str, value: int) -> bool:
         """ Sets a script setting.
 
-        :param str id:       Id of the setting that the module needs to access.
-        :param int value:    Value of the setting.
+        :param id:       ID of the setting that the module needs to access.
+        :param value:    Value of the setting.
+
+        :return: True if the value of the setting was set, false otherwise
+
+        """
+
+        self.setInt(id, value)
+        return True
+
+    def setInt(self, id: str, value: int) -> None:
+        """ Sets a script setting.
+
+        :param id:       ID of the setting that the module needs to access.
+        :param value:    Value of the setting.
 
         """
 
         self.__settings[id] = str(value)
-        return True
 
-    def setSettingNumber(self, id, value):  # NOSONAR
+    def setSettingNumber(self, id: str, value: float) -> bool:
         """ Sets a script setting.
 
-        :param str id:       Id of the setting that the module needs to access.
+        :param str id:       ID of the setting that the module needs to access.
+        :param float value:  Value of the setting.
+
+        :return: True if the value of the setting was set, false otherwise
+
+        """
+
+        self.setNumber(id, value)
+        return True
+
+    def setNumber(self, id: str, value: float) -> None:
+        """ Sets a script setting.
+
+        :param str id:       ID of the setting that the module needs to access.
         :param float value:  Value of the setting.
 
         """
 
         self.__settings[id] = str(value)
-        return True
 
-    def setSettingString(self, id, value):  # NOSONAR
+    def setSettingString(self, id: str, value: str) -> bool:  # NOSONAR
         """ Sets a script setting.
 
-        :param str id:       Id of the setting that the module needs to access.
-        :param str value:  Value of the setting.
+        :param id:     ID of the setting that the module needs to access.
+        :param value:  Value of the setting.
+
+        :return: True if the value of the setting was set, false otherwise
+
+        """
+
+        self.setString(id, value)
+        return True
+
+    def setString(self, id: str, value: str) -> None:  # NOSONAR
+        """ Sets a script setting.
+
+        :param id:     ID of the setting that the module needs to access.
+        :param value:  Value of the setting.
 
         """
 
         self.__settings[id] = value
-        return True
 
     def getAddonInfo(self, id):  # NOSONAR
         """ Returns the value of an addon property as a string.
