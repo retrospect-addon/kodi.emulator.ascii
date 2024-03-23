@@ -1,4 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0
+from typing import List, Optional, Union
+
 
 from sakee.colors import Colors
 from sakee.stub import KodiStub
@@ -16,416 +18,6 @@ INPUT_PASSWORD = 5
 
 PASSWORD_VERIFY = 1
 ALPHANUM_HIDE_INPUT = 2
-
-
-class Dialog(KodiStub):
-    def __init__(self):
-        super(Dialog, self).__init__()
-
-    def ok(self, heading, message):  # NOSONAR
-        """ OK dialog
-
-        The functions permit the call of a dialog of information, a confirmation
-        of the user by press from OK required.
-
-        :param str heading:      dialog heading.
-        :param str message:      dialog message.
-
-        :return: Returns True if 'Ok' was pressed, else False.
-        :rtype: bool
-
-        Example::
-
-            dialog = xbmcgui.Dialog()
-            ok = dialog.ok('Kodi', 'There was an error.')
-
-        """
-
-        KodiStub.print_heading(heading)
-
-        if KodiStub.is_interactive:
-            self.read_input("{}. OK?".format(message), color=Colors.Yellow)
-        else:
-            KodiStub.print_line("{}. OK?".format(message), Colors.Yellow)
-        return True
-
-    # noinspection PyUnusedLocal
-    def textviewer(self, heading, text, usemono=False):
-        """ The text viewer dialog can be used to display descriptions, help texts or other larger texts.
-
-        :param str heading:     Dialog heading.
-        :param str text:        Dialog text.
-        :param bool usemono:    Use a monospace font.
-
-        """
-
-        text = self.replace_colors(text)
-        text = text.replace("\\n", "\n")
-        self.print_heading(heading)
-        self.print_line(text)
-        self.print_line("=" * 120, color=Colors.Yellow)
-
-        if KodiStub.is_interactive:
-            self.read_input("OK?", color=Colors.Yellow)
-        else:
-            KodiStub.print_line("OK?", Colors.Yellow)
-        return True
-
-    # noinspection PyPep8Naming,PyUnusedLocal
-    def multiselect(self, heading, options, autoclose=0, preselect=None, useDetails=False):  # NOSONAR
-        """ Show a multi-select dialog.
-
-        :param str heading:                     Dialog heading.
-        :param list[string|ListItem] options:   Options to choose from.
-        :param int autoclose:                   Milliseconds to autoclose dialog. (default=do not autoclose)
-        :param list[int]|None preselect:        Indexes of items to preselect in list (default: do not preselect any item)
-        :param bool useDetails:                 Use detailed list instead of a compact list. (default=false)
-
-        :return: Returns the selected items as a list of indices, or None if cancelled.
-        :rtype: list[int]
-
-        """
-
-        self.print_heading(heading)
-
-        selections = []
-        for i in range(0, len(options)):
-            self.print_line("{} ) {}".format(i, options[i]))
-            selections.append(str(i))
-        self.print_line("=" * 120, color=Colors.Yellow)
-        selections = self.read_input("What items to select (%s)? " % (",".join(selections)),
-                                     color=Colors.Yellow).lower()
-        if not selections:
-            return None
-        return list(map(lambda index_value: int(index_value), selections.split(",")))
-
-    # noinspection PyPep8Naming,PyUnusedLocal
-    def select(self, heading, options, autoclose=0, preselect=None, useDetails=False):  # NOSONAR
-        """ Show a select dialog.
-
-        :param str heading:                     Dialog heading.
-        :param list[string|ListItem] options:   Options to choose from.
-        :param int autoclose:                   Milliseconds to autoclose dialog. (default=do not autoclose)
-        :param int|None preselect:              Indexes of items to preselect in list (default: do not preselect any item)
-        :param bool useDetails:                 Use detailed list instead of a compact list. (default=false)
-
-        :return: Returns the selected items as a list of indices, or None if cancelled.
-        :rtype: int
-
-        """
-        self.print_heading(heading)
-
-        selections = []
-        for i in range(0, len(options)):
-            self.print_line("{} ) {}".format(i, options[i]))
-            selections.append(str(i))
-        self.print_line("=" * 120, color=Colors.Yellow)
-        selections = self.read_input("What item to select (%s)? " % (",".join(selections)), color=Colors.Yellow).lower()
-        if not selections:
-            return None
-        return list(map(lambda index_value: int(index_value), selections.split(",")))[0]
-
-    # noinspection PyUnusedLocal
-    def yesno(self, heading, message, nolabel='', yeslabel='', customlabel=None, autoclose=0):
-        """ The Yes / No dialog can be used to inform the user about questions and get the answer.
-
-        :param str heading:             Dialog heading.
-        :param str message:             Message to display.
-        :param str nolabel:             Label to put on the no button.
-        :param str yeslabel:            Label to put on the yes button.
-        :param str|None customlabel:    Label to put on the custom button.
-        :param autoclose:               Milliseconds to autoclose dialog. (default=do not autoclose)
-
-        :return: Returns True if 'Yes' was pressed, else False.
-        :rtype: bool
-
-        """
-
-        if not nolabel:
-            nolabel = "No"
-
-        if not yeslabel:
-            yeslabel = "Yes"
-
-        self.print_heading(heading)
-        question = "{} [{}]{} or [{}]{}:".format(message, yeslabel[0], yeslabel[1:], nolabel[0], nolabel[1:])
-        if KodiStub.is_interactive:
-            answer = self.read_input(question, Colors.Yellow)
-            return yeslabel.lower().startswith(answer.lower())
-        else:
-            KodiStub.print_line(question, Colors.Yellow)
-            return True
-
-    # noinspection PyUnusedLocal
-    def notification(self, heading, message, icon=NOTIFICATION_INFO, time=5000, sound=True):
-        """ Show a Notification alert.
-
-        :param str heading:             Dialog heading.
-        :param str message:             Message to display.
-        :param str icon:                Icon to use. (default=xbmcgui.NOTIFICATION_INFO)
-        :param int time:                Time in milliseconds.
-        :param str sound:               Play notification sound. (default=True)
-
-        ============================  ============
-        Icon                          Description
-        ============================  ============
-        xbmcgui.NOTIFICATION_INFO     Info icon
-        xbmcgui.NOTIFICATION_WARNING  Warning icon
-        xbmcgui.NOTIFICATION_ERROR    Error icon
-        ============================  ============
-
-        """
-        if icon == NOTIFICATION_WARNING:
-            color = Colors.Yellow
-        elif icon == NOTIFICATION_ERROR:
-            color = Colors.Red
-        else:
-            color = Colors.White
-
-        self.print_heading(heading, align_right=True, color=color)
-        self.print_line(message, color=color)
-        self.print_line("=" * 120, color)
-
-    # noinspection PyUnusedLocal
-    def input(self, heading, defaultt='', type=INPUT_ALPHANUM, option=0, autoclose=0):
-        """ Show an input dialog.
-
-        :param str heading:             Dialog heading.
-        :param str defaultt:            Default value
-        :param int type:                The type of keyboard dialog.
-        :param str option:              Option for the dialog.
-        :param int autoclose:           Milliseconds to autoclose dialog. (default=do not autoclose)
-
-        ========================  =========================================
-        Type                      Description
-        ========================  =========================================
-        xbmcgui.INPUT_ALPHANUM    Standard keyboard
-        xbmcgui.INPUT_NUMERIC     Format: #
-        xbmcgui.INPUT_DATE        Format: DD/MM/YYYY
-        xbmcgui.INPUT_TIME        Format: HH:MM
-        xbmcgui.INPUT_IPADDRESS   Format: #.#.#.#
-        xbmcgui.INPUT_PASSWORD    Return MD5 hash of input, input is masked
-        ========================  =========================================
-
-        ===========================  ============================================================================
-        Option                       Description
-        ===========================  ============================================================================
-        xbmcgui.PASSWORD_VERIFY      Verifies an existing (default) md5 hashed password. Use with INPUT_PASSWORD.
-        xbmcgui.ALPHANUM_HIDE_INPUT  Masks input. Use with INPUT_ALPHANUM.
-        ===========================  ============================================================================
-
-        :return: Returns the entered data as a string. Returns an empty string if dialog was canceled.
-        :rtype: str
-
-        """
-        if not self.is_interactive:
-            keyboard = self.get_keyboard_stub()
-            value = keyboard.get_next_input()
-            return value if value is not None else defaultt
-
-        KodiStub.print_heading(heading)
-        try:
-            answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
-            return answer if answer != '' else defaultt
-        except EOFError:
-            return ''
-
-    # noinspection PyUnusedLocal
-    def numeric(self, type, heading, defaultt=None, bHiddenInput=None):
-        """ Show an numeric input dialog.
-
-        :param int type:                The type of numeric dialog.
-        :param str heading:             Dialog heading (will be ignored for type 4).
-        :param str defaultt:            Default value.
-        :param bool bHiddenInput:       Mask input (available for type 0).
-
-        =====  ========================  ========================================================
-        Param  Type                      Description
-        =====  ========================  ========================================================
-        0      ShowAndGetNumber          Default format: #
-        1      ShowAndGetDate            Default format: DD/MM/YYYY
-        2      ShowAndGetTime            Default format: HH:MM
-        3      ShowAndGetIPAddress       Default format: #.#.#.#
-        4      ShowAndVerifyNewPassword  Default format: *
-        =====  ========================  ========================================================
-
-        :return: Returns the entered data as a string. Returns the default value if dialog was canceled.
-        :rtype: str
-
-        """
-        if not self.is_interactive:
-            keyboard = self.get_keyboard_stub()
-            value = keyboard.get_next_input()
-            return value if value is not None else defaultt
-
-        KodiStub.print_heading(heading)
-        try:
-            answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
-            return answer if answer != '' else defaultt
-        except EOFError:
-            return ''
-
-    # noinspection PyUnusedLocal
-    def browse(self, type, heading, shares, mask='', useThumbs=False, treatAsFolder=False, defaultt='', enableMultiple=False):
-        """ Browser dialog.
-
-        The function offer the possibility to select a file by the user of the add-on.
-        It allows all the options that are possible in Kodi itself and offers all support file types.
-
-        :param int type:                The type of browse dialog.
-        :param str heading:             Dialog heading.
-        :param str shares:              From sources.xml
-        :param str mask:                '|' separated file mask. (i.e. '.jpg|.png')
-        :param bool useThumbs:          Auto switch to Thumb view if files exist.
-        :param bool treatAsFolder:      Playlists and archives act as folders.
-        :param str defaultt:            Default path or file.
-        :param bool enableMultiple:     Multiple file selection is enabled.
-
-        ========================  =========================================
-        Type                      Description
-        ========================  =========================================
-        0                         ShowAndGetDirectory
-        1                         ShowAndGetFile
-        2                         ShowAndGetImage
-        3                         ShowAndGetWriteableDirectory
-        ========================  =========================================
-
-        ===========================  ============================================================================
-        Shares                       Description
-        ===========================  ============================================================================
-        "programs"                   list program addons
-        "video"                      list video sources
-        "music"                      list music sources
-        "pictures"                   list picture sources
-        "files"                      list file sources (added through filemanager)
-        "games"                      list game sources
-        "local"                      list local drives
-        ""                           list local drives and network shares
-        ===========================  ============================================================================
-
-        :return: If enableMultiple is False (default): returns filename and/or path as a string to the location of the highlighted item, if user pressed 'Ok' or
-                 a masked item was selected. Returns the default value if dialog was canceled.
-                 If enableMultiple is True: returns tuple of marked filenames as a string if user pressed 'Ok' or a masked item was selected. Returns empty
-                 tuple if dialog was canceled.
-                 If type is 0 or 3 the enableMultiple parameter is ignored.
-
-        :rtype: str|tuple[str]
-
-        """
-        if enableMultiple:
-            return self.browseMultiple(type, heading, shares, mask, useThumbs, treatAsFolder, defaultt)
-        else:
-            return self.browseSingle(type, heading, shares, mask, useThumbs, treatAsFolder, defaultt)
-
-    # noinspection PyUnusedLocal
-    def browseMultiple(self, type, heading, shares, mask='', useThumbs=False, treatAsFolder=False, defaultt=''):
-        """ Browser dialog.
-
-        The function offer the possibility to select a file by the user of the add-on.
-        It allows all the options that are possible in Kodi itself and offers all support file types.
-
-        :param int type:                The type of browse dialog.
-        :param str heading:             Dialog heading.
-        :param str shares:              From sources.xml
-        :param str mask:                '|' separated file mask. (i.e. '.jpg|.png')
-        :param bool useThumbs:          Auto switch to Thumb view if files exist.
-        :param bool treatAsFolder:      Playlists and archives act as folders.
-        :param str defaultt:            Default path or file.
-
-        ========================  =========================================
-        Type                      Description
-        ========================  =========================================
-        0                         ShowAndGetDirectory
-        1                         ShowAndGetFile
-        2                         ShowAndGetImage
-        3                         ShowAndGetWriteableDirectory
-        ========================  =========================================
-
-        ===========================  ============================================================================
-        Shares                       Description
-        ===========================  ============================================================================
-        "programs"                   list program addons
-        "video"                      list video sources
-        "music"                      list music sources
-        "pictures"                   list picture sources
-        "files"                      list file sources (added through filemanager)
-        "games"                      list game sources
-        "local"                      list local drives
-        ""                           list local drives and network shares
-        ===========================  ============================================================================
-
-        :return: Returns tuple of marked filenames as a string if user pressed 'Ok' or a masked item was selected.
-                 Returns empty tuple if dialog was canceled.
-
-        :rtype: tuple[str]
-
-        """
-        if not self.is_interactive:
-            keyboard = self.get_keyboard_stub()
-            value = keyboard.get_next_input()
-            return (value,) if value is not None else (defaultt,)
-
-        KodiStub.print_heading(heading)
-        try:
-            answer = self.read_input("Please enter the path to a file [{}]?".format(defaultt), color=Colors.Yellow)
-            return (answer,) if answer != '' else (defaultt,)
-        except EOFError:
-            return ()
-
-    # noinspection PyUnusedLocal
-    def browseSingle(self, type, heading, shares, mask='', useThumbs=False, treatAsFolder=False, defaultt=''):
-        """ Browser dialog.
-
-        The function offer the possibility to select a file by the user of the add-on.
-        It allows all the options that are possible in Kodi itself and offers all support file types.
-
-        :param int type:                The type of browse dialog.
-        :param str heading:             Dialog heading.
-        :param str shares:              From sources.xml
-        :param str mask:                '|' separated file mask. (i.e. '.jpg|.png')
-        :param bool useThumbs:          Auto switch to Thumb view if files exist.
-        :param bool treatAsFolder:      Playlists and archives act as folders.
-        :param str defaultt:            Default path or file.
-
-        ========================  =========================================
-        Type                      Description
-        ========================  =========================================
-        0                         ShowAndGetDirectory
-        1                         ShowAndGetFile
-        2                         ShowAndGetImage
-        3                         ShowAndGetWriteableDirectory
-        ========================  =========================================
-
-        ===========================  ============================================================================
-        Shares                       Description
-        ===========================  ============================================================================
-        "programs"                   list program addons
-        "video"                      list video sources
-        "music"                      list music sources
-        "pictures"                   list picture sources
-        "files"                      list file sources (added through filemanager)
-        "games"                      list game sources
-        "local"                      list local drives
-        ""                           list local drives and network shares
-        ===========================  ============================================================================
-
-        :return: Returns filename and/or path as a string to the location of the highlighted item, if user pressed 'Ok' or a masked item was selected.
-                 Returns the default value if dialog was canceled.
-
-        :rtype: str
-
-        """
-        if not self.is_interactive:
-            keyboard = self.get_keyboard_stub()
-            value = keyboard.get_next_input()
-            return value if value is not None else defaultt
-
-        KodiStub.print_heading(heading)
-        try:
-            answer = self.read_input("Please enter the path to a file [{}]?".format(defaultt), color=Colors.Yellow)
-            return answer if answer != '' else defaultt
-        except EOFError:
-            return ''
 
 
 # noinspection PyPep8Naming
@@ -652,6 +244,427 @@ class ListItem(KodiStub):
         return self.__str__()
 
 
+# noinspection PyPep8Naming,PyShadowingBuiltins
+class Dialog(KodiStub):
+    def __init__(self):
+        super(Dialog, self).__init__()
+
+    def ok(self, heading: str, message: str) -> bool:
+        """ OK dialog
+
+        The functions permit the call of a dialog of information, a confirmation
+        of the user by press from OK required.
+
+        :param heading:      dialog heading.
+        :param message:      dialog message.
+
+        :return: Returns True if 'Ok' was pressed, else False.
+
+        Example::
+
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('Kodi', 'There was an error.')
+
+        """
+
+        KodiStub.print_heading(heading)
+
+        if KodiStub.is_interactive:
+            self.read_input("{}. OK?".format(message), color=Colors.Yellow)
+        else:
+            KodiStub.print_line("{}. OK?".format(message), Colors.Yellow)
+        return True
+
+    # noinspection PyUnusedLocal
+    def textviewer(self, heading: str, text: str, usemono: bool = False) -> None:
+        """ The text viewer dialog can be used to display descriptions,
+        help texts or other larger texts.
+
+        :param heading:     Dialog heading.
+        :param text:        Dialog text.
+        :param usemono:     Use a monospace font.
+
+        """
+
+        text = self.replace_colors(text)
+        text = text.replace("\\n", "\n")
+        self.print_heading(heading)
+        self.print_line(text)
+        self.print_line("=" * 120, color=Colors.Yellow)
+
+        if KodiStub.is_interactive:
+            self.read_input("OK?", color=Colors.Yellow)
+        else:
+            KodiStub.print_line("OK?", Colors.Yellow)
+        return
+
+    # noinspection PyPep8Naming,PyUnusedLocal
+    def multiselect(self, heading: str,
+                    options: Union[List[str], List[ListItem]],
+                    autoclose: int = 0,
+                    preselect: Optional[List[int]] = None,
+                    useDetails: bool = False) -> Optional[List[int]]:
+        """ Show a multi-select dialog.
+
+        :param heading:          Dialog heading.
+        :param options:          Options to choose from.
+        :param autoclose:        Milliseconds to autoclose dialog. (default=do not autoclose)
+        :param preselect:        Indexes of items to preselect in list (default: do not preselect any item)
+        :param useDetails:       Use detailed list instead of a compact list. (default=false)
+
+        :return: Returns the selected items as a list of indices, or None if cancelled.
+
+        """
+
+        self.print_heading(heading)
+
+        selections = []
+        for i in range(0, len(options)):
+            self.print_line("{} ) {}".format(i, options[i]))
+            selections.append(str(i))
+        self.print_line("=" * 120, color=Colors.Yellow)
+        selections = self.read_input("What items to select (%s)? " % (",".join(selections)),
+                                     color=Colors.Yellow).lower()
+        if not selections:
+            return None
+        return list(map(lambda index_value: int(index_value), selections.split(",")))
+
+    # noinspection PyPep8Naming,PyUnusedLocal
+    def select(self, heading: str,
+               options: Union[List[str], List[ListItem]],
+               autoclose: int = 0, preselect: int = -1,
+               useDetails: bool = False) -> Optional[int]:
+        """ Show a select dialog.
+
+        :param heading:         Dialog heading.
+        :param options:         Options to choose from.
+        :param autoclose:       Milliseconds to autoclose dialog. (default=do not autoclose)
+        :param preselect:       Indexes of items to preselect in list (default: do not preselect any item)
+        :param useDetails:      Use detailed list instead of a compact list. (default=false)
+
+        :return: Returns the selected items as a list of indices, or None if cancelled.
+
+        """
+        self.print_heading(heading)
+
+        selections = []
+        for i in range(0, len(options)):
+            self.print_line("{} ) {}".format(i, options[i]))
+            selections.append(str(i))
+        self.print_line("=" * 120, color=Colors.Yellow)
+        selections = self.read_input("What item to select (%s)? " % (",".join(selections)), color=Colors.Yellow).lower()
+        if not selections:
+            return None
+        return list(map(lambda index_value: int(index_value), selections.split(",")))[0]
+
+    # noinspection PyUnusedLocal
+    def yesno(self, heading: str, message: str, nolabel: str = "", yeslabel: str = "",
+              customlabel: Optional[str] = None, autoclose: int = 0) -> bool:
+        """ The Yes / No dialog can be used to inform the user about questions and get the answer.
+
+        :param heading:             Dialog heading.
+        :param message:             Message to display.
+        :param nolabel:             Label to put on the no button.
+        :param yeslabel:            Label to put on the yes button.
+        :param customlabel:         Label to put on the custom button.
+        :param autoclose:           Milliseconds to autoclose dialog. (default=do not autoclose)
+
+        :return: Returns True if 'Yes' was pressed, else False.
+
+        """
+
+        if not nolabel:
+            nolabel = "No"
+
+        if not yeslabel:
+            yeslabel = "Yes"
+
+        self.print_heading(heading)
+        question = "{} [{}]{} or [{}]{}:".format(message, yeslabel[0], yeslabel[1:], nolabel[0], nolabel[1:])
+        if KodiStub.is_interactive:
+            answer = self.read_input(question, Colors.Yellow)
+            return yeslabel.lower().startswith(answer.lower())
+        else:
+            KodiStub.print_line(question, Colors.Yellow)
+            return True
+
+    # noinspection PyUnusedLocal
+    def notification(self, heading: str, message: str, icon: str = NOTIFICATION_INFO,
+                     time: int = 5000, sound: bool = True) -> False:
+        """ Show a Notification alert.
+
+        :param heading:             Dialog heading.
+        :param message:             Message to display.
+        :param icon:                Icon to use. (default=xbmcgui.NOTIFICATION_INFO)
+        :param time:                Time in milliseconds.
+        :param sound:               Play notification sound. (default=True)
+
+        ============================  ============
+        Icon                          Description
+        ============================  ============
+        xbmcgui.NOTIFICATION_INFO     Info icon
+        xbmcgui.NOTIFICATION_WARNING  Warning icon
+        xbmcgui.NOTIFICATION_ERROR    Error icon
+        ============================  ============
+
+        """
+        if icon == NOTIFICATION_WARNING:
+            color = Colors.Yellow
+        elif icon == NOTIFICATION_ERROR:
+            color = Colors.Red
+        else:
+            color = Colors.White
+
+        self.print_heading(heading, align_right=True, color=color)
+        self.print_line(message, color=color)
+        self.print_line("=" * 120, color)
+
+    # noinspection PyUnusedLocal
+    def input(self, heading: str, defaultt: str = "", type: int = INPUT_ALPHANUM,
+              option: int = 0, autoclose: int = 0):
+        """ Show an input dialog.
+
+        :param heading:             Dialog heading.
+        :param defaultt:            Default value
+        :param type:                The type of keyboard dialog.
+        :param option:              Option for the dialog.
+        :param autoclose:           Milliseconds to autoclose dialog. (default=do not autoclose)
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        xbmcgui.INPUT_ALPHANUM    Standard keyboard
+        xbmcgui.INPUT_NUMERIC     Format: #
+        xbmcgui.INPUT_DATE        Format: DD/MM/YYYY
+        xbmcgui.INPUT_TIME        Format: HH:MM
+        xbmcgui.INPUT_IPADDRESS   Format: #.#.#.#
+        xbmcgui.INPUT_PASSWORD    Return MD5 hash of input, input is masked
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Option                       Description
+        ===========================  ============================================================================
+        xbmcgui.PASSWORD_VERIFY      Verifies an existing (default) md5 hashed password. Use with INPUT_PASSWORD.
+        xbmcgui.ALPHANUM_HIDE_INPUT  Masks input. Use with INPUT_ALPHANUM.
+        ===========================  ============================================================================
+
+        :return: Returns the entered data as a string. Returns an empty string if dialog was canceled.
+        :rtype: str
+
+        """
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return value if value is not None else defaultt
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
+            return answer if answer != "" else defaultt
+        except EOFError:
+            return ""
+
+    # noinspection PyUnusedLocal
+    def numeric(self, type: int, heading: str, defaultt: str = "", bHiddenInput: bool = False):
+        """ Show an numeric input dialog.
+
+        :param type:                The type of numeric dialog.
+        :param heading:             Dialog heading (will be ignored for type 4).
+        :param defaultt:            Default value.
+        :param bHiddenInput:        Mask input (available for type 0).
+
+        =====  ========================  ========================================================
+        Param  Type                      Description
+        =====  ========================  ========================================================
+        0      ShowAndGetNumber          Default format: #
+        1      ShowAndGetDate            Default format: DD/MM/YYYY
+        2      ShowAndGetTime            Default format: HH:MM
+        3      ShowAndGetIPAddress       Default format: #.#.#.#
+        4      ShowAndVerifyNewPassword  Default format: *
+        =====  ========================  ========================================================
+
+        :return: Returns the entered data as a string. Returns the default value if dialog was canceled.
+
+        """
+
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return value if value is not None else defaultt
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please provide keyboard input [{}]?".format(defaultt), color=Colors.Yellow)
+            return answer if answer != "" else defaultt
+        except EOFError:
+            return ""
+
+    # noinspection PyUnusedLocal
+    def browse(self, type: int, heading: str, shares: str, mask: str = "", useThumbs: bool = False,
+               treatAsFolder: bool = False, defaultt: str = "",
+               enableMultiple: bool = False) -> Union[str, List[str]]:
+        """ Browser dialog.
+
+        The function offer the possibility to select a file by the user of the add-on.
+        It allows all the options that are possible in Kodi itself and offers all support file types.
+
+        :param type:                The type of browse dialog.
+        :param heading:             Dialog heading.
+        :param shares:              From sources.xml
+        :param mask:                '|' separated file mask. (i.e. '.jpg|.png')
+        :param useThumbs:           Auto switch to Thumb view if files exist.
+        :param treatAsFolder:       Playlists and archives act as folders.
+        :param defaultt:            Default path or file.
+        :param enableMultiple:      Multiple file selection is enabled.
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        0                         ShowAndGetDirectory
+        1                         ShowAndGetFile
+        2                         ShowAndGetImage
+        3                         ShowAndGetWriteableDirectory
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Shares                       Description
+        ===========================  ============================================================================
+        "programs"                   list program addons
+        "video"                      list video sources
+        "music"                      list music sources
+        "pictures"                   list picture sources
+        "files"                      list file sources (added through filemanager)
+        "games"                      list game sources
+        "local"                      list local drives
+        ""                           list local drives and network shares
+        ===========================  ============================================================================
+
+        :return: If enableMultiple is False (default): returns filename and/or path as a string to the location of the highlighted item, if user pressed 'Ok' or
+                 a masked item was selected. Returns the default value if dialog was canceled.
+                 If enableMultiple is True: returns tuple of marked filenames as a string if user pressed 'Ok' or a masked item was selected. Returns empty
+                 tuple if dialog was canceled.
+                 If type is 0 or 3 the enableMultiple parameter is ignored.
+
+        """
+
+        if enableMultiple:
+            return self.browseMultiple(type, heading, shares, mask, useThumbs, treatAsFolder, defaultt)
+        else:
+            return self.browseSingle(type, heading, shares, mask, useThumbs, treatAsFolder, defaultt)
+
+    # noinspection PyUnusedLocal
+    def browseMultiple(self, type: int, heading: str, shares: str, mask: str = "",
+                       useThumbs: bool = False, treatAsFolder: bool = False,
+                       defaultt: str = "") -> List[str]:
+        """ Browser dialog.
+
+        The function offer the possibility to select a file by the user of the add-on.
+        It allows all the options that are possible in Kodi itself and offers all support file types.
+
+        :param type:                The type of browse dialog.
+        :param heading:             Dialog heading.
+        :param shares:              From sources.xml
+        :param mask:                '|' separated file mask. (i.e. '.jpg|.png')
+        :param useThumbs:           Auto switch to Thumb view if files exist.
+        :param treatAsFolder:       Playlists and archives act as folders.
+        :param defaultt:            Default path or file.
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        0                         ShowAndGetDirectory
+        1                         ShowAndGetFile
+        2                         ShowAndGetImage
+        3                         ShowAndGetWriteableDirectory
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Shares                       Description
+        ===========================  ============================================================================
+        "programs"                   list program addons
+        "video"                      list video sources
+        "music"                      list music sources
+        "pictures"                   list picture sources
+        "files"                      list file sources (added through filemanager)
+        "games"                      list game sources
+        "local"                      list local drives
+        ""                           list local drives and network shares
+        ===========================  ============================================================================
+
+        :return: Returns tuple of marked filenames as a string if user pressed 'Ok' or a masked item was selected.
+                 Returns empty tuple if dialog was canceled.
+
+        """
+
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return [value] if value is not None else [defaultt]
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please enter the path to a file [{}]?".format(defaultt), color=Colors.Yellow)
+            return [answer] if answer != "" else [defaultt]
+        except EOFError:
+            return []
+
+    # noinspection PyUnusedLocal
+    def browseSingle(self, type: int, heading: str, shares: str, mask: str = "",
+                     useThumbs: bool = False, treatAsFolder: bool = False,
+                     defaultt: str = "") -> str:
+        """ Browser dialog.
+
+        The function offer the possibility to select a file by the user of the add-on.
+        It allows all the options that are possible in Kodi itself and offers all support file types.
+
+        :param type:                The type of browse dialog.
+        :param heading:             Dialog heading.
+        :param shares:              From sources.xml
+        :param mask:                '|' separated file mask. (i.e. '.jpg|.png')
+        :param useThumbs:           Auto switch to Thumb view if files exist.
+        :param treatAsFolder:       Playlists and archives act as folders.
+        :param defaultt:            Default path or file.
+
+        ========================  =========================================
+        Type                      Description
+        ========================  =========================================
+        0                         ShowAndGetDirectory
+        1                         ShowAndGetFile
+        2                         ShowAndGetImage
+        3                         ShowAndGetWriteableDirectory
+        ========================  =========================================
+
+        ===========================  ============================================================================
+        Shares                       Description
+        ===========================  ============================================================================
+        "programs"                   list program addons
+        "video"                      list video sources
+        "music"                      list music sources
+        "pictures"                   list picture sources
+        "files"                      list file sources (added through filemanager)
+        "games"                      list game sources
+        "local"                      list local drives
+        ""                           list local drives and network shares
+        ===========================  ============================================================================
+
+        :return: Returns filename and/or path as a string to the location of the highlighted item, if user pressed 'Ok' or a masked item was selected.
+                 Returns the default value if dialog was canceled.
+
+        """
+
+        if not self.is_interactive:
+            keyboard = self.get_keyboard_stub()
+            value = keyboard.get_next_input()
+            return value if value is not None else defaultt
+
+        KodiStub.print_heading(heading)
+        try:
+            answer = self.read_input("Please enter the path to a file [{}]?".format(defaultt), color=Colors.Yellow)
+            return answer if answer != "" else defaultt
+        except EOFError:
+            return ""
+
+
 class DialogProgress(KodiStub):
     def __init__(self):
         """ Kodi's progress dialog class (Duh!) """
@@ -660,12 +673,12 @@ class DialogProgress(KodiStub):
 
         super(DialogProgress, self).__init__()
 
-    def create(self, heading, message=""):
+    def create(self, heading: str, message: str = "") -> None:
         """
         Create and show a progress dialog.
 
-        :param str heading:       dialog heading.
-        :param str|None message:  line #1 multi-line text.
+        :param heading:   dialog heading.
+        :param message:   line f text to show.
 
         It is preferred to only use line1 as it is actually a multi-line text.
         In this case line2 and line3 must be omitted.
@@ -678,11 +691,11 @@ class DialogProgress(KodiStub):
         self.print_heading(heading)
         self.print_line(message)
 
-    def update(self, percent, message=""):
+    def update(self, percent: int, message: str = "") -> None:
         """ Updates the progress dialog.
 
-        :param int percent:         Percent complete. (0:100)
-        :param str|None message:    Message to show.
+        :param percent:    Percent complete. (0:100)
+        :param message:    Message to show.
 
         """
 
@@ -690,11 +703,11 @@ class DialogProgress(KodiStub):
             "{}{}%{}: {}".format(
                 Colors.Yellow, percent, Colors.EndColor, message or self.__message))
 
-    def close(self):
+    def close(self) -> None:
         """ Close the progress dialog. """
         self.print_line("=" * 120, color=Colors.Yellow)
 
-    def iscanceled(self):
+    def iscanceled(self) -> bool:
         """ Checks progress is canceled. """
         return False
 
@@ -705,12 +718,12 @@ class DialogProgressBG(KodiStub):
         self.__message = None
         super(DialogProgressBG, self).__init__()
 
-    def create(self, heading, message=""):
+    def create(self, heading: str, message: str = "") -> None:
         """
         Create and show a progress background dialog.
 
-        :param str heading:       dialog heading.
-        :param str|None message:  line #1 multi-line text.
+        :param heading:   dialog heading.
+        :param message:   line f text to show.
 
         It is preferred to only use line1 as it is actually a multi-line text.
         In this case line2 and line3 must be omitted.
@@ -723,12 +736,12 @@ class DialogProgressBG(KodiStub):
         self.print_heading(heading, align_right=True)
         self.print_line(message)
 
-    def update(self, percent, heading="", message=""):
+    def update(self, percent: int, heading: str = "", message: str = "") -> None:
         """ Updates the progress dialog.
 
-        :param int percent:         Percent complete. (0:100)
-        :param str|None heading:    Dialog heading.
-        :param str|None message:    Message to show.
+        :param percent:    Percent complete. (0:100)
+        :param heading:    Dialog heading.
+        :param message:    Message to show.
 
         """
 
@@ -741,11 +754,11 @@ class DialogProgressBG(KodiStub):
                 "{}{}%{}: {}".format(
                     Colors.Yellow, percent, Colors.EndColor, message or self.__message))
 
-    def close(self):
+    def close(self) -> None:
         """ Close the progress dialog. """
         self.print_line("=" * 120, color=Colors.Yellow)
 
     # noinspection PyPep8Naming
-    def isFinished(self):
-        """ Checks progress is canceled. """
+    def isFinished(self) -> bool:
+        """ Checks progress is finished. """
         return False
