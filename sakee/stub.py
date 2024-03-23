@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import random
+from typing import Optional, Any
 
 from sakee.colors import Colors
 
@@ -14,19 +15,19 @@ class KeyboardStub(object):
         self.__queue = []
         self.reset()
 
-    def add_input(self, line):
+    def add_input(self, line: str) -> None:
         self.__queue.append(line)
 
-    def clear_input(self):
+    def clear_input(self) -> None:
         self.__queue = []
 
-    def get_next_input(self):
+    def get_next_input(self) -> Optional[str]:
         if len(self.__queue) == 0:
             return None
 
         return self.__queue.pop(0)
 
-    def reset(self):
+    def reset(self) -> None:
         self.__queue = []
         line = os.environ.get("KODI_STUB_INPUT", None)
         if line:
@@ -34,28 +35,30 @@ class KeyboardStub(object):
 
 
 class KodiStub(object):
+    PY2: bool
+    PY3: bool
+
     __keyboard_stub = None
 
-    is_interactive = os.environ.get("KODI_INTERACTIVE", "1") == "1"
-    is_verbose = os.environ.get("KODI_STUB_VERBOSE", "0") == "1"
+    is_interactive: bool = os.environ.get("KODI_INTERACTIVE", "1") == "1"
+    is_verbose: bool = os.environ.get("KODI_STUB_VERBOSE", "0") == "1"
 
     def __init__(self):
         self.PY2 = sys.version_info[0] == 2
         self.PY3 = sys.version_info[0] == 3
 
-    def get_keyboard_stub(self):
+    def get_keyboard_stub(self) -> KeyboardStub:
         if KodiStub.__keyboard_stub is None:
             KodiStub.__keyboard_stub = KeyboardStub()
 
         return KodiStub.__keyboard_stub
 
-    def read_input(self, text, color=None):
+    def read_input(self, text: str, color: Optional[str] = None) -> str:
         """ Reads user's input from the console
 
-        :param str text:    Question for the input
+        :param text:    Question for the input
 
         :return: the read input
-        :rtype: str
 
         """
 
@@ -68,14 +71,14 @@ class KodiStub(object):
         return input(text) if self.PY3 else raw_input(text)
 
     @staticmethod
-    def print_heading(text, align_right=False, color=Colors.Yellow):
+    def print_heading(text: str, align_right: bool = False, color: str = Colors.Yellow) -> None:
         """ Aligns text over 120 chars
 
-        :param str text:            The Text to align
-        :param bool align_right:    Align right instead of left?
+        :param text:            The Text to show.
+        :param align_right:     Align right instead of left?
+        :param color:           The color to use.
 
-        :return: the aligned text
-        :rrtype: str
+        :return: The headline text.
 
         """
 
@@ -89,12 +92,12 @@ class KodiStub(object):
         KodiStub.print_line(heading, color=color)
 
     @staticmethod
-    def print_line(line, color=None, verbose=False):
+    def print_line(line: str, color: Optional[str] = None, verbose: bool = False) -> None:
         """ Prints a full line including colors
 
-        :param str line:        The line to print
-        :param str color:       The color to print (use Color)
-        :param bool verbose:    Is the line verbose data?
+        :param line:        The line to print
+        :param color:       The color to print (use Color)
+        :param verbose:     Is the line verbose data?
 
         """
 
@@ -106,13 +109,13 @@ class KodiStub(object):
         else:
             print(line)
 
-    def log_method(self, code_module, name, *args, **kwargs):
+    def log_method(self, code_module: str, name: str, *args: Any, **kwargs: Any) -> None:
         """
 
-        :param str code_module: The module that called this method
-        :param str name:        The method that was callled
-        :param *args:           The arguments that were passed
-        :param **kwargs:        The keyword arguments that where passed
+        :param code_module:  The module that called this method
+        :param name:         The method that was callled
+        :param *args:        The arguments that were passed
+        :param **kwargs:     The keyword arguments that where passed
 
         :return: None
 
@@ -132,12 +135,11 @@ class KodiStub(object):
             print("-> %s.%s(kwargs=%s)" % (code_module, name, kwargs))
 
     @staticmethod
-    def replace_colors(color_tag):
+    def replace_colors(color_tag: str) -> str:
         """ Replace the Kodi color tags with actual tags.
 
-        :param str color_tag: The text that contains color tags
+        :param color_tag: The text that contains color tags
 
-        :rtype: str
         :return: The text with actual ASCII color codes
 
         """
@@ -159,10 +161,10 @@ class KodiStub(object):
         color_tag = color_tag.replace("[/COLOR]", Colors.EndColor)
         return color_tag
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         """ Logs any missing methods calls
 
         :param str name:    The name of the attribute
