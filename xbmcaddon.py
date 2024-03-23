@@ -242,13 +242,12 @@ class Addon(KodiStub):
 
         self.__settings[id] = value
 
-    def getAddonInfo(self, id):  # NOSONAR
+    def getAddonInfo(self, id: str) -> str:
         """ Returns the value of an addon property as a string.
 
-        :param str id:  Id of the property that the module needs to access.
+        :param id:  Id of the property that the module needs to access.
 
         :return: Returns the value of an addon property as a string.
-        :rtype: str
 
         Possible options are: author, changelog, description, disclaimer, fanart, icon, id,
                               name, path, profile, stars, summary, type, version
@@ -265,7 +264,7 @@ class Addon(KodiStub):
         elif id == "disclaimer":
             return self.__disclaimer
         elif id == "fanart":
-            return self.__fanart
+            return str(self.__fanart)
         elif id == "icon":
             return self.__icon
         elif id == "id":
@@ -275,7 +274,7 @@ class Addon(KodiStub):
         elif id == "path":
             return self.__add_on_path
         elif id == "profile":
-            return self.__add_on_profile_path
+            return str(self.__add_on_profile_path)
         elif id == "summary":
             return self.__summary
         elif id == "version":
@@ -283,7 +282,7 @@ class Addon(KodiStub):
 
         raise ValueError("Cannot find info '%s'" % (id,))
 
-    def getLocalizedString(self, id):  # NOSONAR
+    def getLocalizedString(self, id: int) -> str:
         """ Returns an addon's localized 'unicode string'.
 
         :param int id:      Id# for string you want to localize.
@@ -295,7 +294,7 @@ class Addon(KodiStub):
 
         return self.__localization.get(id, "Translated {}".format(id))
 
-    def openSettings(self):  # NOSONAR
+    def openSettings(self) -> None:
         self.print_heading("Add-on settings")
         for setting, value in self.__settings.items():
             self.print_line("{}:{}".format(setting, value), verbose=True)
