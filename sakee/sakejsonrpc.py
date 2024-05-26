@@ -81,6 +81,49 @@ class JsonRpcApi(object):
                 )
             )
 
+    # noinspection PyPep8Naming
+    class Favourites:
+        def __init__(self, addon_info):
+            """ Initialise the JSON RPC API Addons Namespace.
+
+            :param obj addon_info:   Information about the current Add-on paths.
+            """
+            self._ADDON_INFO = addon_info
+
+        def GetFavourites(self, **params):
+            favourites = os.path.join(self._ADDON_INFO.kodi_profile_path, "favourites.xml")
+            content = io.open(favourites, "r").read()
+            matches = re.findall(r'name="([^"]+)".*?>([^(]+)\((?:(\d+),)?&quot;([^<]+)&quot;', content)
+
+            result = {
+                "favourites": [],
+                "limits": {
+                    "end": 0,
+                    "start": 0,
+                    "total": 0
+                }
+            }
+            favs = result["favourites"]
+
+            for name, action, window_id, param in matches:
+                if action == "PlayMedia":
+                    action_type = "media"
+                elif action == "ActivateWindow":
+                    action_type = "window"
+                else:
+                    action_type = None
+
+                fav = {
+                    "title": name,
+                    "type": action_type,
+                    "windowparameter": param
+                }
+                favs.append(fav)
+
+            result["limits"]["end"] = len(favs)
+            result["limits"]["total"] = len(favs)
+            return result
+
     class Settings(object):
         """ Allows manipulation of Kodi settings. """
         __SETTINGS = None
