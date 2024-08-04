@@ -833,7 +833,7 @@ def getInfoLabel(infoTag):  # NOSONAR
     """
 
     if infoTag.lower() == "system.buildversion":
-        return "19.0 Git:20200626-xxxxxxxxxx"
+        return "21.0 Git:20240406-xxxxxxxxxx"
 
     if infoTag.lower() == "network.ipaddress":
         import socket
