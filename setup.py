@@ -9,7 +9,7 @@ project_dir = os.path.dirname(os.path.abspath(__file__))
 
 setup(
     name='sakee',
-    version="0.1.7",
+    version="0.1.8",
     url='https://github.com/retrospect-addon/kodi.emulator.ascii',
     author='Bas Rieter',
     description='SAKÉ can help you to debug and develop Kodi Python add-ons',
@@ -25,5 +25,5 @@ setup(
         'Tracker': 'https://github.com/retrospect-addon/kodi.emulator.ascii/issues',
     },
     zip_safe=False,
-    python_requires='>=2.7'
+    python_requires='>=3.0'
 )
