@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0
+from sakee.colors import Colors
 import io
 import os
 import re
@@ -141,6 +142,9 @@ class Settings:
         #     raise TypeError(f"Setting '{id}' requires a list of integer values")
         # self.__settings[id] = json.dumps(values)
 
+    def _raw_settings(self) -> Dict[str, str]:
+        return self.__settings
+
     def __getitem__(self, id: str) -> str:
         """ Returns the actual stored string value for the setting with `id` for TESTING purposes only.
 
@@ -150,10 +154,23 @@ class Settings:
 
         """
 
-        return self.__settings[id]
+        return self.__settings.get(id, "")
 
-    def _raw_settings(self) -> Dict[str, str]:
-        return self.__settings
+    def __setitem__(self, id: str, value: str) -> None:
+        """ Sets the string value of the setting with `id` to `value` for TESTING purposes only.
+
+        :param id:      The ID of the setting.
+        :param value:   The string value for this settings.
+
+        """
+
+        self.__settings[id] = value
+
+    def items(self):
+        return self.__settings.items()
+
+    def __iter__(self):
+        return self.__settings.__iter__()
 
     def __len__(self):
         return len(self.__settings)
@@ -237,7 +254,15 @@ class Settings:
 
 # noinspection PyPep8Naming,PyShadowingBuiltins
 class Addon(KodiStub):
-    __settings = {}
+    __version: Optional[str]
+    __name: Optional[str]
+    __author: Optional[str]
+    __icon: Optional[str]
+    __summary: Optional[str]
+    __news: Optional[str]
+    __disclaimer: Optional[str]
+    __description: Optional[str]
+    __settings: Settings
 
     def __init__(self, id=None):
         super(Addon, self).__init__()
@@ -261,14 +286,31 @@ class Addon(KodiStub):
         self.__description = None
         self.__load_add_on_xml()
         self.__localization = self.__get_strings()
-        self.__settings = self.__get_settings()
 
-    def getSettings(self):
         default_settings_path = os.path.join(self.__add_on_path, "resources", "settings.xml")
         profile_settings_path = os.path.join(self.__add_on_profile_path, "settings.xml")
+        self.__settings = Settings(default_settings_path, profile_settings_path)
 
-        s = Settings(default_settings_path, profile_settings_path)
-        return s
+    def getLocalizedString(self, id: int) -> str:
+        """ Returns an addon's localized 'unicode string'.
+
+        :param int id:      Id# for string you want to localize.
+
+        :return: Localized 'unicode string'
+        :rtype: str
+
+        """
+
+        return self.__localization.get(id, "Translated {}".format(id))
+
+    def getSettings(self):
+        """ Returns a wrapper around the addon’s settings.
+
+        :return: A wrapper around the addon’s settings.
+
+        """
+
+        return self.__settings
 
     def getSetting(self, id: str) -> Optional[str]:
         """ Returns the value of a setting as a unicode string.
@@ -280,10 +322,7 @@ class Addon(KodiStub):
 
         """
 
-        if id in self.__settings:
-            return self.__settings[id]
-        else:
-            return ""
+        return self.getSettings()[id]
 
     def getSettingBool(self, id: str) -> bool:
         """ Returns the value of a setting as a boolean.
@@ -294,20 +333,8 @@ class Addon(KodiStub):
 
         """
 
-
-
-        return self.getBool(id)
-
-    def getBool(self, id: str) -> bool:
-        """ Returns the value of a setting as a boolean.
-
-        :param id: ID of the setting that the module needs to access.
-
-        :return: The value of a setting as a boolean.
-
-        """
-
-        return self.getSetting(id).lower() == "true"
+        self.print_line("Deprecated. Use Settings.getBool() instead.", color=Colors.Red)
+        return self.__settings.getBool(id)
 
     def getSettingInt(self, id: str) -> int:
         """ Returns the value of a setting as an integer.
@@ -319,18 +346,8 @@ class Addon(KodiStub):
 
         """
 
-        return self.getInt(id)
-
-    def getInt(self, id: str) -> int:
-        """ Returns the value of a setting as an integer.
-
-        :param id: ID of the setting that the module needs to access.
-
-        :return: The value of a setting as an integer.
-
-        """
-
-        return int(self.getSetting(id) or 0)
+        self.print_line("Deprecated. Use Settings.getInt() instead.", color=Colors.Red)
+        return self.__settings.getInt(id)
 
     def getSettingNumber(self, id: str) -> float:
         """ Returns the value of a setting as a floating point number.
@@ -341,18 +358,8 @@ class Addon(KodiStub):
 
         """
 
-        return self.getNumber(id)
-
-    def getNumber(self, id: str) -> float:
-        """ Returns the value of a setting as a floating point number.
-
-        :param id: ID of the setting that the module needs to access.
-
-        :return: The value of a setting as a floating point number.
-
-        """
-
-        return float(self.getSetting(id) or 0.0)
+        self.print_line("Deprecated. Use Settings.getNumber() instead.", color=Colors.Red)
+        return self.__settings.getNumber(id)
 
     def getSettingString(self, id: str) -> str:
         """ Returns the value of a setting as a string.
@@ -363,18 +370,8 @@ class Addon(KodiStub):
 
         """
 
-        return self.getString(id)
-
-    def getString(self, id: str) -> str:
-        """ Returns the value of a setting as a string.
-
-        :param id: ID of the setting that the module needs to access.
-
-        :return: The value of a setting as a string.
-
-        """
-
-        return str(self.getSetting(id) or "")
+        self.print_line("Deprecated. Use Settings.getString() instead.", color=Colors.Red)
+        return self.__settings.getString(id)
 
     def setSetting(self, id: str, value: str) -> None:
         """ Sets a script setting.
@@ -396,18 +393,9 @@ class Addon(KodiStub):
 
         """
 
-        self.setBool(id, value)
+        self.print_line("Deprecated. Use Settings.setBool() instead.", color=Colors.Red)
+        self.__settings.setBool(id, value)
         return True
-
-    def setBool(self, id: str, value: bool) -> None:
-        """ Sets a script setting.
-
-        :param id:       ID of the setting that the module needs to access.
-        :param value:    Value of the setting.
-
-        """
-
-        self.__settings[id] = "true" if value else "false"
 
     def setSettingInt(self, id: str, value: int) -> bool:
         """ Sets a script setting.
@@ -419,18 +407,9 @@ class Addon(KodiStub):
 
         """
 
-        self.setInt(id, value)
+        self.print_line("Deprecated. Use Settings.setInt() instead.", color=Colors.Red)
+        self.__settings.setInt(id, value)
         return True
-
-    def setInt(self, id: str, value: int) -> None:
-        """ Sets a script setting.
-
-        :param id:       ID of the setting that the module needs to access.
-        :param value:    Value of the setting.
-
-        """
-
-        self.__settings[id] = str(value)
 
     def setSettingNumber(self, id: str, value: float) -> bool:
         """ Sets a script setting.
@@ -442,18 +421,9 @@ class Addon(KodiStub):
 
         """
 
-        self.setNumber(id, value)
+        self.print_line("Deprecated. Use Settings.setNumber() instead.", color=Colors.Red)
+        self.__settings.setNumber(id, value)
         return True
-
-    def setNumber(self, id: str, value: float) -> None:
-        """ Sets a script setting.
-
-        :param str id:       ID of the setting that the module needs to access.
-        :param float value:  Value of the setting.
-
-        """
-
-        self.__settings[id] = str(value)
 
     def setSettingString(self, id: str, value: str) -> bool:  # NOSONAR
         """ Sets a script setting.
@@ -465,18 +435,14 @@ class Addon(KodiStub):
 
         """
 
-        self.setString(id, value)
+        self.print_line("Deprecated. Use Settings.setString() instead.", color=Colors.Red)
+        self.__settings.setString(id, value)
         return True
 
-    def setString(self, id: str, value: str) -> None:  # NOSONAR
-        """ Sets a script setting.
-
-        :param id:     ID of the setting that the module needs to access.
-        :param value:  Value of the setting.
-
-        """
-
-        self.__settings[id] = value
+    def openSettings(self) -> None:
+        self.print_heading("Add-on settings")
+        for setting, value in self.__settings.items():
+            self.print_line("{}:{}".format(setting, value), verbose=True)
 
     def getAddonInfo(self, id: str) -> str:
         """ Returns the value of an addon property as a string.
@@ -492,48 +458,31 @@ class Addon(KodiStub):
         # missing: starts - type
 
         if id == "author":
-            return self.__author
+            return self.__author or ""
         elif id == "changelog":
-            return self.__news
+            return self.__news or ""
         elif id == "description":
-            return self.__description
+            return self.__description or ""
         elif id == "disclaimer":
-            return self.__disclaimer
+            return self.__disclaimer or ""
         elif id == "fanart":
             return str(self.__fanart)
         elif id == "icon":
-            return self.__icon
+            return self.__icon or ""
         elif id == "id":
-            return self.__add_on_id
+            return self.__add_on_id or ""
         elif id == "name":
-            return self.__name
+            return self.__name or ""
         elif id == "path":
-            return self.__add_on_path
+            return self.__add_on_path or ""
         elif id == "profile":
-            return str(self.__add_on_profile_path)
+            return self.__add_on_profile_path
         elif id == "summary":
-            return self.__summary
+            return self.__summary or ""
         elif id == "version":
-            return self.__version
+            return self.__version or ""
 
         raise ValueError("Cannot find info '%s'" % (id,))
-
-    def getLocalizedString(self, id: int) -> str:
-        """ Returns an addon's localized 'unicode string'.
-
-        :param int id:      Id# for string you want to localize.
-
-        :return: Localized 'unicode string'
-        :rtype: str
-
-        """
-
-        return self.__localization.get(id, "Translated {}".format(id))
-
-    def openSettings(self) -> None:
-        self.print_heading("Add-on settings")
-        for setting, value in self.__settings.items():
-            self.print_line("{}:{}".format(setting, value), verbose=True)
 
     def __repr__(self):
         return repr(self.__settings)
@@ -606,43 +555,3 @@ class Addon(KodiStub):
             icon_matches = re.findall(r'<icon>(.*?)</icon>', xml_content, flags=re.DOTALL)
             if icon_matches:
                 self.__icon = os.path.join(self.__add_on_path, icon_matches[0])
-
-    def __get_settings(self):
-        if self.__add_on_id in Addon.__settings:
-            settings = Addon.__settings[self.__add_on_id]
-            return settings
-
-        # load defaults
-        settings = {}
-        settings_xml = os.path.join(self.__add_on_path, "resources", "settings.xml")
-        if not os.path.isfile(settings_xml):
-            Addon.__settings[self.__add_on_id] = settings
-            return settings
-
-        with io.open(settings_xml, encoding='utf-8') as fp:
-            default_xml = fp.read()
-
-        setting_regex = r'id="([^"]+)"[^>]*default="([^"]*)"'
-        results = re.findall(setting_regex, default_xml)
-        if not results:
-            results = re.findall(r'setting id="(.*?)".*?(?:<default>(.*?)<|<default\s*/>|<data)', default_xml, re.DOTALL)
-        settings = {}
-        for result in results:
-            settings[result[0]] = result[1]
-
-        user_xml = os.path.join(self.__add_on_profile_path, "settings.xml")
-        if os.path.isfile(user_xml):
-            with io.open(user_xml, encoding="utf-8") as fp:
-                user_xml = fp.read()
-
-            setting_regex = r'id="([^"]+)"[^>]*value="([^"]*)"'
-            results = re.findall(setting_regex, user_xml)
-            if not results:
-                results = re.findall(r'id="([^"/]+)"[^/>]*>([^<]+)<', user_xml)
-
-            for result in results:
-                # if result[0] in settings:  -> We need to keep all settings in the settings.xml
-                settings[result[0]] = result[1]
-
-        Addon.__settings[self.__add_on_id] = settings
-        return settings
