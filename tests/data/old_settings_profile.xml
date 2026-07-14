@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settings>
+    <setting id="no_type" value="No typed value" />
+    <setting id="text" value="Kodi" />
+    <setting id="bool" value="false" />
+    <setting id="number" value="1.618" />
+
+    <setting id="slider_int" value="73" />
+    <setting id="slider_float" value="4.5" />
+
+    <setting id="enum" value="2" />
+    <setting id="select" value="0" />
+
+    <setting id="lvalues_enum" value="1" />
+    <setting id="lvalues_select" value="2" />
+
+    <setting id="setting_file" value="/home/user/movie.mkv" />
+    <setting id="setting_folder" value="/home/user/Videos" />
+    <setting id="path" value="special://profile/" />
+
+    <setting id="ip" value="10.0.0.5" />
+</settings>

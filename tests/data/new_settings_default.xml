@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings version="1">
+    <section id="general" label="General">
+
+        <category id="general" label="General">
+
+            <group id="1">
+
+                <setting id="no_type" type="string" label="No Type">
+                    <default>No typed text</default>
+                    <control type="edit" format="string"/>
+                </setting>
+
+                <setting id="text" type="string" label="Text">
+                    <default>Hello World</default>
+                    <control type="edit" format="string"/>
+                </setting>
+
+                <setting id="bool" type="boolean" label="Boolean">
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+
+                <setting id="number" type="number" label="Number">
+                    <default>3.14</default>
+                    <control type="edit" format="number"/>
+                </setting>
+
+                <setting id="slider_int" type="integer" label="Integer Slider">
+                    <default>42</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <step>1</step>
+                        <maximum>100</maximum>
+                    </constraints>
+                    <control type="slider" format="integer"/>
+                </setting>
+
+                <setting id="slider_float" type="number" label="Float Slider">
+                    <default>2.5</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <step>0.5</step>
+                        <maximum>10</maximum>
+                    </constraints>
+                    <control type="slider" format="number"/>
+                </setting>
+
+                <setting id="enum" type="integer" label="Enum">
+                    <default>1</default>
+                    <constraints>
+                        <options>
+                            <option label="One">0</option>
+                            <option label="Two">1</option>
+                            <option label="Three">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="integer"/>
+                </setting>
+
+                <setting id="select" type="string" label="Select">
+                    <default>2</default>
+                    <constraints>
+                        <options>
+                            <option label="Red">0</option>
+                            <option label="Green">1</option>
+                            <option lable="Blue">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+
+                <setting id="lvalues_enum" type="integer" label="Localized Enum">
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30001">0</option>
+                            <option label="30002">1</option>
+                            <option label="30003">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="integer"/>
+                </setting>
+
+                <setting id="lvalues_select" type="string" label="Localized Select">
+                    <default>1</default>
+                    <constraints>
+                        <options>
+                            <option label="30011">0</option>
+                            <option label="30012">1</option>
+                            <option label="30013">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+
+                <setting id="setting_file" type="string" label="File">
+                    <default>/tmp/file.txt</default>
+                    <control type="button" format="file"/>
+                </setting>
+
+                <setting id="setting_fileenum" type="string" label="File Enum">
+                    <default>/tmp/file.txt</default>
+                    <control type="button" format="file"/>
+                </setting>
+
+                <setting id="setting_audio" type="string" label="Audio">
+                    <default>/tmp/file.mp3</default>
+                    <control type="button" format="audio"/>
+                </setting>
+
+                <setting id="setting_video" type="string" label="Video">
+                    <default>/tmp/file.mp4</default>
+                    <control type="button" format="video"/>
+                </setting>
+
+                <setting id="setting_image" type="string" label="Image">
+                    <default>/tmp/file.jpg</default>
+                    <control type="button" format="image"/>
+                </setting>
+
+                <setting id="setting_executable" type="string" label="Executable">
+                    <default>/tmp/file.exe</default>
+                    <control type="button" format="executable"/>
+                </setting>
+
+                <setting id="setting_folder" type="string" label="Folder">
+                    <default>/tmp</default>
+                    <control type="button" format="folder"/>
+                </setting>
+
+                <setting id="path" type="string" label="Path">
+                    <default>/storage</default>
+                    <control type="button" format="path"/>
+                </setting>
+
+                <setting id="ip" type="string" label="IP Address">
+                    <default>192.168.1.100</default>
+                    <control type="edit" format="ip"/>
+                </setting>
+
+            </group>
+
+        </category>
+
+    </section>
+</settings>

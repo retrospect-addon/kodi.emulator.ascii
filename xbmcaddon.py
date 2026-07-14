@@ -1,12 +1,239 @@
 # SPDX-License-Identifier: GPL-3.0
-import os
 import io
+import os
 import re
+import xml.etree.ElementTree as ElementTree
+from typing import Dict, List, Literal
 from typing import Optional
 
 from sakee import addoninfo
 from sakee.stub import KodiStub
 
+SettingType = Literal[
+    "string",
+    "boolean",
+    "integer",
+    "float",
+    "string_list",
+    "boolean_list",
+    "integer_list",
+    "float_list",
+]
+
+
+# noinspection PyPep8Naming,PyShadowingBuiltins
+class Settings:
+    __profile_settings_path: Optional[str]
+    __default_settings_path: str
+    __settings: Dict[str, str]
+    __setting_types: Dict[str, SettingType]
+
+    def __init__(self, default_settings_path: str, profile_settings_path: Optional[str] = None) -> None:
+        self.__default_settings_path = default_settings_path
+        self.__profile_settings_path = profile_settings_path
+        self.__settings = {}
+        self.__setting_types = {}
+        self.__read_settings()
+
+    # String settings
+    def getString(self, id: str) -> str:
+        self.__validate_setting_type(id, "string")
+        return self.__settings[id]
+
+    def setString(self, id: str, value: str) -> None:
+        self.__validate_setting_type(id, "string")
+        if not isinstance(value, str):
+            raise TypeError(f"Setting '{id}' requires a string value")
+        self.__settings[id] = value
+
+    def getStringList(self, id: str) -> List[str]:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "string_list")
+        # values = json.loads(self.__settings[id])
+        # return [str(value) for value in values]
+
+    def setStringList(self, id: str, values: List[str]) -> None:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "string_list")
+        # if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
+        #     raise TypeError(f"Setting '{id}' requires a list of strings")
+        # self.__settings[id] = json.dumps(values)
+
+    # Boolean settings
+    def getBool(self, id: str) -> bool:
+        self.__validate_setting_type(id, "boolean")
+        return self.__settings[id].strip().lower() == "true"
+
+    def setBool(self, id: str, value: bool) -> None:
+        self.__validate_setting_type(id, "boolean")
+        if not isinstance(value, bool):
+            raise TypeError(f"Setting '{id}' requires a boolean value")
+        self.__settings[id] = "true" if value else "false"
+
+    def getBoolList(self, id: str) -> List[bool]:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "boolean_list")
+        # values = json.loads(self.__settings[id])
+        # return [bool(value) for value in values]
+
+    def setBoolList(self, id: str, values: List[bool]) -> None:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "boolean_list")
+        # if not isinstance(values, list) or not all(isinstance(value, bool) for value in values):
+        #     raise TypeError(f"Setting '{id}' requires a list of booleans")
+        # self.__settings[id] = json.dumps(values)
+
+    # Integer settings
+    def getInt(self, id: str) -> int:
+        self.__validate_setting_type(id, "integer")
+        return int(self.__settings[id])
+
+    def setInt(self, id: str, value: int) -> None:
+        self.__validate_setting_type(id, "integer")
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise TypeError(f"Setting '{id}' requires an integer value")
+        self.__settings[id] = str(value)
+
+    def getIntList(self, id: str) -> List[int]:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "integer_list")
+        # values = json.loads(self.__settings[id])
+        # return [int(value) for value in values]
+
+    def setIntList(self, id: str, values: List[int]) -> None:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "integer_list")
+        # if not isinstance(values, list) or not all(
+        #     isinstance(value, int) and not isinstance(value, bool) for value in values
+        # ):
+        #     raise TypeError(f"Setting '{id}' requires a list of integers")
+        # self.__settings[id] = json.dumps(values)
+
+    # Number settings
+    def getNumber(self, id: str) -> float:
+        self.__validate_setting_type(id, "float")
+        return float(self.__settings[id])
+
+    def setNumber(self, id: str, value: float) -> None:
+        self.__validate_setting_type(id, "float")
+        if not isinstance(value, float):
+            raise TypeError(f"Setting '{id}' requires a floating-point value")
+        self.__settings[id] = str(value)
+
+    def getNumberList(self, id: str) -> List[float]:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "integer_list")
+        # values = json.loads(self.__settings[id])
+        # return [float(value) for value in values]
+
+    def setNumberList(self, id: str, values: List[float]) -> None:
+        raise NotImplementedError("Not Yet Implemented")
+
+        # self.__validate_setting_type(id, "integer_list")
+        # if not isinstance(values, list) or not all(isinstance(value, float) for value in values):
+        #     raise TypeError(f"Setting '{id}' requires a list of integer values")
+        # self.__settings[id] = json.dumps(values)
+
+    def __getitem__(self, id: str) -> str:
+        """ Returns the actual stored string value for the setting with `id` for TESTING purposes only.
+
+        :param id:  The ID of the setting.
+
+        :return: The string value of the setting.
+
+        """
+
+        return self.__settings[id]
+
+    def _raw_settings(self) -> Dict[str, str]:
+        return self.__settings
+
+    def __len__(self):
+        return len(self.__settings)
+
+    def __read_settings(self) -> None:
+        if not os.path.isfile(self.__default_settings_path):
+            return
+
+        with io.open(self.__default_settings_path, encoding="utf-8") as fp:
+            default_root = ElementTree.parse(fp).getroot()
+
+        for element in default_root.iter("setting"):
+            setting_id = element.get("id")
+
+            if not setting_id:
+                continue
+
+            setting_type = self.__get_setting_type(element)
+            default_node = [a for a in element.iterfind("default")]
+            if default_node:
+                default_value = default_node[0].text or ""
+            else:
+                default_value = element.get("default", "")
+
+            self.__setting_types[setting_id] = setting_type
+            self.__settings[setting_id] = default_value
+
+        if not self.__profile_settings_path or not os.path.isfile(self.__profile_settings_path):
+            return
+
+        with io.open(self.__profile_settings_path, encoding="utf-8") as fp:
+            profile_root = ElementTree.parse(fp).getroot()
+
+        for element in profile_root.iter("setting"):
+            setting_id = element.get("id")
+
+            if not setting_id or setting_id not in self.__setting_types:
+                continue
+
+            value = element.get("value")
+            if value is None:
+                value = element.text or ""
+
+            self.__settings[setting_id] = value
+
+    @staticmethod
+    def __get_setting_type(element: ElementTree.Element) -> SettingType:
+        setting_type = element.get("type", "text").lower()
+        option = element.get("option", "").lower()
+
+        if setting_type == "bool":
+            return "boolean"
+
+        if setting_type == "number":
+            return "float"
+
+        if setting_type in {"enum", "lvalues_enum"}:
+            return "integer"
+
+        if setting_type == "slider":
+            return "float" if option == "float" else "integer"
+
+        if setting_type in {"boolean", "integer", "string"}:
+            return setting_type
+
+        if setting_type == "number_list":
+            return "integer_list"
+
+        if setting_type in {"string_list", "boolean_list", "integer_list"}:
+            return setting_type
+
+        return "string"
+
+    def __validate_setting_type(self, id: str, expected_type: SettingType) -> None:
+        if id not in self.__settings:
+            raise KeyError(f"Unknown setting '{id}'")
+
+        actual_type = self.__setting_types[id]
+        if actual_type != expected_type:
+            raise TypeError(f"Setting '{id}' is '{actual_type}', not '{expected_type}'")
 
 # noinspection PyPep8Naming,PyShadowingBuiltins
 class Addon(KodiStub):
@@ -36,6 +263,13 @@ class Addon(KodiStub):
         self.__localization = self.__get_strings()
         self.__settings = self.__get_settings()
 
+    def getSettings(self):
+        default_settings_path = os.path.join(self.__add_on_path, "resources", "settings.xml")
+        profile_settings_path = os.path.join(self.__add_on_profile_path, "settings.xml")
+
+        s = Settings(default_settings_path, profile_settings_path)
+        return s
+
     def getSetting(self, id: str) -> Optional[str]:
         """ Returns the value of a setting as a unicode string.
 
@@ -59,6 +293,8 @@ class Addon(KodiStub):
         :return: The value of a setting as a boolean.
 
         """
+
+
 
         return self.getBool(id)
 
