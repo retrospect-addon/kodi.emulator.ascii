@@ -1,10 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0
 
+from typing import Optional
 import io
 import json
 import os
 import signal
 import time
+from datetime import datetime
+from typing import List
 
 from sakee import addoninfo
 from sakee.colors import Colors
@@ -36,6 +39,477 @@ SERVER_ZEROCONF = 7
 TRAY_CLOSED_MEDIA_PRESENT = 96
 TRAY_CLOSED_NO_MEDIA = 64
 TRAY_OPEN = 16
+
+
+# noinspection PyPep8Naming
+class Actor:
+    """Cast member used by InfoTagVideo.setCast() and getActors()."""
+
+    def __init__(self, name="", role="", order=-1, thumbnail=""):
+        if not name:
+            raise ValueError("Actor name must not be empty")
+        self._info = {"Name": name, "Role": role, "Order": order, "Thumbnail": thumbnail}
+
+    def getName(self) -> str:
+        return str(self._info.get("Name", ""))
+
+    def setName(self, name: str) -> None:
+        self._info["Name"] = name
+
+    def getRole(self) -> str:
+        return str(self._info.get("Role", ""))
+
+    def setRole(self, role: str) -> None:
+        self._info["Role"] = role
+
+    def getOrder(self) -> int:
+        return int(self._info.get("Order", -1))
+
+    def setOrder(self, order: int) -> None:
+        self._info["Order"] = order
+
+    def getThumbnail(self) -> str:
+        return str(self._info.get("Thumbnail", ""))
+
+    def setThumbnail(self, thumbnail: str) -> None:
+        self._info["Thumbnail"] = thumbnail
+
+
+# noinspection PyPep8Naming
+class _InfoTag:
+    """Shared video/music metadata, backed directly by a ListItem dictionary."""
+
+    def __init__(self, offscreen: bool = False, info=None):
+        """The emulator accepts offscreen but does not need GUI locks."""
+        self._info = info if info is not None else {}
+
+    def getTitle(self) -> str:
+        return self._info.get("Title", "")
+
+    def setTitle(self, title: str) -> None:
+        self._info["Title"] = title
+
+    def getMediaType(self) -> str:
+        return self._info.get("mediatype", "")
+
+    def setMediaType(self, mediaType: str) -> None:
+        self._info["mediatype"] = mediaType
+
+    def getYear(self) -> int:
+        return self._info.get("Year", 0)
+
+    def setYear(self, year: int) -> None:
+        self._info["Year"] = year
+
+    def getDuration(self) -> int:
+        return self._info.get("Duration", 0)
+
+    def setDuration(self, duration: int) -> None:
+        self._info["Duration"] = duration
+
+    def getGenres(self) -> List[str]:
+        return list(self._info.get("Genre", []))
+
+    def setGenres(self, genres: List[str]) -> None:
+        self._info["Genre"] = list(genres)
+
+    def getAlbum(self) -> str:
+        return self._info.get("Album", "")
+
+    def setAlbum(self, album: str) -> None:
+        self._info["Album"] = album
+
+    def getUserRating(self) -> int:
+        return self._info.get("UserRating", 0)
+
+    def setUserRating(self, userrating: int) -> None:
+        self._info["UserRating"] = userrating
+
+    def getDbId(self) -> int:
+        return self._info.get("DbId", -1)
+
+    def getTrack(self) -> int:
+        return self._info.get("TrackNumber", 0)
+
+    def getPlayCount(self) -> int:
+        return self._info.get("PlayCount", 0)
+
+    def getGenre(self) -> str:
+        return " / ".join(self.getGenres())
+
+    def getLastPlayed(self) -> str:
+        """Use the host locale for Kodi's legacy localized date/time getter."""
+        value = self._info.get("LastPlayed", "")
+        return datetime.fromisoformat(value).strftime("%x %X") if value else ""
+
+    def getLastPlayedAsW3C(self) -> str:
+        return self._info.get("LastPlayed", "").replace(" ", "T")
+
+    def setLastPlayed(self, lastPlayed: str) -> None:
+        self._info["LastPlayed"] = lastPlayed
+
+
+# noinspection PyPep8Naming
+class InfoTagVideo(_InfoTag):
+    """Dictionary-backed Python InfoTagVideo getters and setters."""
+
+    def getPlot(self) -> str:
+        return self._info.get("Plot", "")
+
+    def setPlot(self, plot: str) -> None:
+        self._info["Plot"] = plot
+
+    def getPlotOutline(self) -> str:
+        return self._info.get("PlotOutline", "")
+
+    def setPlotOutline(self, plotoutline: str) -> None:
+        self._info["PlotOutline"] = plotoutline
+
+    def getTVShowTitle(self) -> str:
+        return self._info.get("TVShowTitle", "")
+
+    def setTvShowTitle(self, tvshowtitle: str) -> None:
+        self._info["TVShowTitle"] = tvshowtitle
+
+    def getSeason(self) -> int:
+        return self._info.get("Season", -1)
+
+    def setSeason(self, season: int) -> None:
+        self._info["Season"] = season
+
+    def getEpisode(self) -> int:
+        return self._info.get("Episode", -1)
+
+    def setEpisode(self, episode: int) -> None:
+        self._info["Episode"] = episode
+
+    def getDirectors(self) -> List[str]:
+        return list(self._info.get("Director", []))
+
+    def setDirectors(self, directors: List[str]) -> None:
+        self._info["Director"] = list(directors)
+
+    def getWriters(self) -> List[str]:
+        return list(self._info.get("Writer", []))
+
+    def setWriters(self, writers: List[str]) -> None:
+        self._info["Writer"] = list(writers)
+
+    def getTagLine(self) -> str:
+        return self._info.get("TagLine", "")
+
+    def setTagLine(self, tagline: str) -> None:
+        self._info["TagLine"] = tagline
+
+    def getOriginalTitle(self) -> str:
+        return self._info.get("OriginalTitle", "")
+
+    def setOriginalTitle(self, originaltitle: str) -> None:
+        self._info["OriginalTitle"] = originaltitle
+
+    def getOriginalLanguage(self) -> str:
+        return self._info.get("OriginalLanguage", "")
+
+    def setOriginalLanguage(self, language: str) -> None:
+        self._info["OriginalLanguage"] = language
+
+    def getTrailer(self) -> str:
+        return self._info.get("Trailer", "")
+
+    def setTrailer(self, trailer: str) -> None:
+        self._info["Trailer"] = trailer
+
+    def getArtist(self) -> List[str]:
+        return list(self._info.get("Artist", []))
+
+    def setArtists(self, artists: List[str]) -> None:
+        self._info["Artist"] = list(artists)
+
+    def getPath(self) -> str:
+        return self._info.get("Path", "")
+
+    def setPath(self, path: str) -> None:
+        self._info["Path"] = path
+
+    def getFilenameAndPath(self) -> str:
+        return self._info.get("FilenameAndPath", "")
+
+    def setFilenameAndPath(self, filenameandpath: str) -> None:
+        self._info["FilenameAndPath"] = filenameandpath
+
+    def getFile(self) -> str:
+        return self._info.get("File", "")
+
+    def getPictureURL(self) -> str:
+        return self._info.get("PictureURL", "")
+
+    def setDbId(self, dbid: int) -> None:
+        self._info["DbId"] = dbid
+
+    def setTrackNumber(self, trackNumber: int) -> None:
+        self._info["TrackNumber"] = trackNumber
+
+    def setPlaycount(self, playcount: int) -> None:
+        self._info["PlayCount"] = playcount
+
+    def setSortEpisode(self, sortepisode: int) -> None:
+        self._info["SortEpisode"] = sortepisode
+
+    def setSortSeason(self, sortseason: int) -> None:
+        self._info["SortSeason"] = sortseason
+
+    def setEpisodeGuide(self, episodeguide: str) -> None:
+        self._info["EpisodeGuide"] = episodeguide
+
+    def setTop250(self, top250: int) -> None:
+        self._info["Top250"] = top250
+
+    def setSetId(self, setid: int) -> None:
+        self._info["SetId"] = setid
+
+    def setMpaa(self, mpaa: str) -> None:
+        self._info["MPAA"] = mpaa
+
+    def setSortTitle(self, sorttitle: str) -> None:
+        self._info["SortTitle"] = sorttitle
+
+    def setTvShowStatus(self, tvshowstatus: str) -> None:
+        self._info["TVShowStatus"] = tvshowstatus
+
+    def setCountries(self, countries: List[str]) -> None:
+        self._info["Country"] = list(countries)
+
+    def setStudios(self, studios: List[str]) -> None:
+        self._info["Studio"] = list(studios)
+
+    def setSet(self, set: str) -> None:
+        self._info["Set"] = set
+
+    def setSetOverview(self, setoverview: str) -> None:
+        self._info["SetOverview"] = setoverview
+
+    def setTags(self, tags: List[str]) -> None:
+        self._info["Tag"] = list(tags)
+
+    def setVideoAssetTitle(self, videoAssetTitle: str) -> None:
+        self._info["VideoAssetTitle"] = videoAssetTitle
+
+    def setProductionCode(self, productioncode: str) -> None:
+        self._info["Code"] = productioncode
+
+    def setDateAdded(self, dateadded: str) -> None:
+        self._info["DateAdded"] = dateadded
+
+    def setShowLinks(self, showlinks: List[str]) -> None:
+        self._info["ShowLink"] = list(showlinks)
+
+    def setAvailableFanart(self, images: List[dict]) -> None:
+        self._info["AvailableFanart"] = list(images)
+
+    def getActors(self) -> List[Actor]:
+        return list(self._info.get("Cast", []))
+
+    def setCast(self, actors: List[Actor]) -> None:
+        self._info["Cast"] = list(actors)
+
+    def getDirector(self) -> str:
+        return " / ".join(self.getDirectors())
+
+    def getWritingCredits(self) -> str:
+        return " / ".join(self.getWriters())
+
+    def getCast(self) -> str:
+        return "\n".join(
+            "{} as {}".format(actor.getName(), actor.getRole()) if actor.getRole()
+            else actor.getName() for actor in self._info.get("Cast", [])
+        )
+
+    def getFirstAired(self) -> str:
+        value = self._info.get("Aired", "")
+        return datetime.fromisoformat(value).strftime("%x") if value else ""
+
+    def getFirstAiredAsW3C(self) -> str:
+        return self._info.get("Aired", "")
+
+    def setFirstAired(self, firstAired: str) -> None:
+        self._info["Aired"] = firstAired
+
+    def getPremiered(self) -> str:
+        value = self._info.get("Premiered", "")
+        return datetime.fromisoformat(value).strftime("%x") if value else ""
+
+    def getPremieredAsW3C(self) -> str:
+        return self._info.get("Premiered", "")
+
+    def setPremiered(self, premiered: str) -> None:
+        self._info["Premiered"] = premiered
+
+    def getResumeTime(self) -> float:
+        return self._info.get("ResumeTime", 0.0)
+
+    def getResumeTimeTotal(self) -> float:
+        return self._info.get("TotalTime", 0.0)
+
+    def setResumePoint(self, time: float, totaltime: float = 0.0) -> None:
+        self._info["ResumeTime"] = time
+        if totaltime > 0.0:
+            self._info["TotalTime"] = totaltime
+
+    def getUniqueID(self, key: str) -> str:
+        key = key or self._info.get("DefaultUniqueID", "imdb")
+        return self._info.get("UniqueIDs", {}).get(key, "")
+
+    def setUniqueID(self, uniqueid: str, type: str = "", isdefault: bool = False) -> None:
+        type = type or self._info.get("DefaultUniqueID", "imdb")
+        self._info.setdefault("UniqueIDs", {})[type] = uniqueid
+        if isdefault or "DefaultUniqueID" not in self._info:
+            self._info["DefaultUniqueID"] = type
+
+    def setUniqueIDs(self, values: dict, defaultuniqueid: str = "") -> None:
+        self._info["UniqueIDs"] = dict(values)
+        self._info["DefaultUniqueID"] = defaultuniqueid or next(iter(values), "imdb")
+
+    def getIMDBNumber(self) -> str:
+        return self.getUniqueID("")
+
+    def setIMDBNumber(self, imdbnumber: str) -> None:
+        self.setUniqueID(imdbnumber)
+
+    def getRating(self, type: str = "") -> float:
+        type = type or self._info.get("DefaultRating", "default")
+        return float(self._info.get("Ratings", {}).get(type, (0.0, 0))[0])
+
+    def getVotesAsInt(self, type: str = "") -> int:
+        type = type or self._info.get("DefaultRating", "default")
+        return int(self._info.get("Ratings", {}).get(type, (0.0, 0))[1])
+
+    def getVotes(self) -> str:
+        return str(self.getVotesAsInt())
+
+    def setRating(self, rating: float, votes: int = 0, type: str = "",
+                  isdefault: bool = False) -> None:
+        type = type or self._info.get("DefaultRating", "default")
+        self._info.setdefault("Ratings", {})[type] = (rating, votes)
+        if isdefault or "DefaultRating" not in self._info:
+            self._info["DefaultRating"] = type
+
+    def setRatings(self, ratings: dict, defaultrating: str = "") -> None:
+        self._info["Ratings"] = {
+            key: (float(value[0]), int(value[1])) for key, value in ratings.items()
+        }
+        self._info["DefaultRating"] = defaultrating or next(iter(ratings), "default")
+
+    def setVotes(self, votes: int) -> None:
+        type = self._info.get("DefaultRating", "default")
+        self._info.setdefault("Ratings", {})[type] = (self.getRating(), votes)
+
+
+# noinspection PyPep8Naming
+class InfoTagMusic(_InfoTag):
+    """Dictionary-backed Python InfoTagMusic getters and setters."""
+
+    def getURL(self) -> str:
+        return self._info.get("URL", "")
+
+    def setURL(self, url: str) -> None:
+        self._info["URL"] = url
+
+    def getArtist(self) -> str:
+        return self._info.get("Artist", "")
+
+    def setArtist(self, artist: str) -> None:
+        self._info["Artist"] = artist
+
+    def getAlbumArtist(self) -> str:
+        return self._info.get("AlbumArtist", "")
+
+    def setAlbumArtist(self, albumArtist: str) -> None:
+        self._info["AlbumArtist"] = albumArtist
+
+    def getDisc(self) -> int:
+        return self._info.get("DiscNumber", 0)
+
+    def setDisc(self, disc: int) -> None:
+        self._info["DiscNumber"] = disc
+
+    def getReleaseDate(self) -> str:
+        return self._info.get("ReleaseDate", "")
+
+    def setReleaseDate(self, releaseDate: str) -> None:
+        self._info["ReleaseDate"] = releaseDate
+
+    def getListeners(self) -> int:
+        return self._info.get("Listeners", 0)
+
+    def setListeners(self, listeners: int) -> None:
+        self._info["Listeners"] = listeners
+
+    def getComment(self) -> str:
+        return self._info.get("Comment", "")
+
+    def setComment(self, comment: str) -> None:
+        self._info["Comment"] = comment
+
+    def getLyrics(self) -> str:
+        return self._info.get("Lyrics", "")
+
+    def setLyrics(self, lyrics: str) -> None:
+        self._info["Lyrics"] = lyrics
+
+    def getMusicBrainzTrackID(self) -> str:
+        return self._info.get("MusicBrainzTrackID", "")
+
+    def setMusicBrainzTrackID(self, musicBrainzTrackID: str) -> None:
+        self._info["MusicBrainzTrackID"] = musicBrainzTrackID
+
+    def getMusicBrainzArtistID(self) -> List[str]:
+        return list(self._info.get("MusicBrainzArtistID", []))
+
+    def setMusicBrainzArtistID(self, musicBrainzArtistID: List[str]) -> None:
+        self._info["MusicBrainzArtistID"] = list(musicBrainzArtistID)
+
+    def getMusicBrainzAlbumID(self) -> str:
+        return self._info.get("MusicBrainzAlbumID", "")
+
+    def setMusicBrainzAlbumID(self, musicBrainzAlbumID: str) -> None:
+        self._info["MusicBrainzAlbumID"] = musicBrainzAlbumID
+
+    def getMusicBrainzReleaseGroupID(self) -> str:
+        return self._info.get("MusicBrainzReleaseGroupID", "")
+
+    def setMusicBrainzReleaseGroupID(self, musicBrainzReleaseGroupID: str) -> None:
+        self._info["MusicBrainzReleaseGroupID"] = musicBrainzReleaseGroupID
+
+    def getMusicBrainzAlbumArtistID(self) -> List[str]:
+        return list(self._info.get("MusicBrainzAlbumArtistID", []))
+
+    def setMusicBrainzAlbumArtistID(self, musicBrainzAlbumArtistID: List[str]) -> None:
+        self._info["MusicBrainzAlbumArtistID"] = list(musicBrainzAlbumArtistID)
+
+    def getSongVideoURL(self) -> str:
+        return self._info.get("SongVideoURL", "")
+
+    def setSongVideoURL(self, songVideoURL: str) -> None:
+        self._info["SongVideoURL"] = songVideoURL
+
+    def setTrack(self, track: int) -> None:
+        self._info["TrackNumber"] = track
+
+    def setPlayCount(self, playcount: int) -> None:
+        self._info["PlayCount"] = playcount
+
+    def setRating(self, rating: float) -> None:
+        self._info["Rating"] = rating
+
+    def setDbId(self, dbId: int, type: str) -> None:
+        self._info["DbId"] = dbId
+        self._info["mediatype"] = type
+
+    def getRating(self) -> int:
+        return int(self._info.get("Rating", 0))
+
+    def getUserRating(self) -> int:
+        return self._info.get("UserRating", -1)
 
 
 # noinspection PyPep8Naming
@@ -102,7 +576,7 @@ class Keyboard(KodiStub):
         self.__line = line
         self.__heading = heading
         self.__hidden = hidden
-        self.__input = ""
+        self.__input: Optional[str] = ""
 
     # noinspection PyUnusedLocal
     def doModal(self, autoclose=0):  # NOSONAR

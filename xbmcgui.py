@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0
-from typing import List, Optional, Union
+from typing import Dict
+from typing import List, Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import xbmc
 
 
 from sakee.colors import Colors
@@ -45,9 +49,15 @@ class ListItem(KodiStub):
 
         super(ListItem, self).__init__()
 
-        self.__info = dict()
+        self.__info: Dict[str, Union[int, str, bool]] = dict()
         self.__art = dict()
         self.__type = None
+        self.__date_time = ""
+
+        # Import here because xbmc imports ListItem for its player API.
+        from xbmc import InfoTagVideo, InfoTagMusic
+        self.__video_info = InfoTagVideo(offscreen=offscreen, info=self.__info)
+        self.__music_info = InfoTagMusic(offscreen=offscreen, info=self.__info)
 
         self.__label = label
         self.__info["*label1"] = label
@@ -89,6 +99,26 @@ class ListItem(KodiStub):
         self.__type = type
         self.__info.update(infoLabels)
         self.print_line("Updating infolabels with {}".format(infoLabels), verbose=True)
+
+    def getVideoInfoTag(self) -> "xbmc.InfoTagVideo":
+        """ Return the video metadata tag attached to this list item. """
+        self.__type = "video"
+        return self.__video_info
+
+    def getMusicInfoTag(self) -> "xbmc.InfoTagMusic":
+        """ Return the music metadata tag attached to this list item. """
+        self.__type = "music"
+        return self.__music_info
+
+    def setDateTime(self, dateTime: str) -> None:
+        """ Set the list item's date/time in W3C format. """
+        self.__date_time = dateTime
+        self.__info["Date"] = dateTime
+        self.print_line("Setting date/time='{}'".format(dateTime), verbose=True)
+
+    def getDateTime(self) -> str:
+        """ Return the list item's date/time in W3C format. """
+        return self.__date_time
 
     def setContentLookup(self, enable):
         """ Enable or disable content lookup for item.
@@ -390,7 +420,7 @@ class Dialog(KodiStub):
 
     # noinspection PyUnusedLocal
     def notification(self, heading: str, message: str, icon: str = NOTIFICATION_INFO,
-                     time: int = 5000, sound: bool = True) -> False:
+                     time: int = 5000, sound: bool = True) -> None:
         """ Show a Notification alert.
 
         :param heading:             Dialog heading.
